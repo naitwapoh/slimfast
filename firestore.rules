@@ -27,6 +27,14 @@ service cloud.firestore {
       allow write: if isWorker();
     }
 
+    // Testimonials collection:
+    // Anyone (customers) can read published testimonials on the landing page.
+    // Only business owners (Admin) can upload, edit, or delete customer testimonials.
+    match /testimonials/{testimonialId} {
+      allow read: if true;
+      allow write: if isOwner();
+    }
+
     // Orders collection:
     // Anyone can create an order (public storefront checkout).
     // Only staff (workers and owners) can read, update status, or fulfill orders.
@@ -44,7 +52,6 @@ service cloud.firestore {
 
     // Users collection:
     // Authenticated users can read their own profile.
-    // If no users exist yet or during first-time setup, anyone can initialize the first owner account.
     // Only owners can create or edit other staff accounts.
     match /users/{userId} {
       allow read: if isAuthenticated();
@@ -64,4 +71,3 @@ service cloud.firestore {
     }
   }
 }
-

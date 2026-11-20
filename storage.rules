@@ -10,6 +10,14 @@ service firebase.storage {
       allow write: if request.auth != null;
     }
 
+    // Customer testimonial photos:
+    // Public read so landing page visitors can see real transformation pictures.
+    // Upload/delete restricted to authenticated admin.
+    match /testimonials/{allPaths=**} {
+      allow read: if true;
+      allow write: if request.auth != null;
+    }
+
     // Business receipts & invoices:
     // Only authenticated owners and workers can access receipts.
     match /receipts/{allPaths=**} {
@@ -17,4 +25,3 @@ service firebase.storage {
     }
   }
 }
-

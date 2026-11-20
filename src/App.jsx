@@ -9,6 +9,7 @@ import { TrustBadges } from './components/storefront/TrustBadges';
 import { ProductCatalog } from './components/storefront/ProductCatalog';
 import { BenefitsSection } from './components/storefront/BenefitsSection';
 import { HowItWorksSection } from './components/storefront/HowItWorksSection';
+import { TestimonialsSection } from './components/storefront/TestimonialsSection';
 import { Footer } from './components/storefront/Footer';
 import { CartDrawer } from './components/storefront/CartDrawer';
 import { BmsPortal } from './components/bms/BmsPortal';
@@ -57,6 +58,7 @@ function AppContent() {
             <ProductCatalog />
             <BenefitsSection />
             <HowItWorksSection />
+            <TestimonialsSection />
           </main>
           <Footer onOpenPortal={openPortal} />
           <CartDrawer />

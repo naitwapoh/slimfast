@@ -40,7 +40,7 @@ export const Navbar = ({ onOpenPortal }) => {
           </a>
 
           {/* Desktop Navigation Links */}
-          <nav className="hidden lg:flex items-center space-x-8">
+          <nav className="hidden lg:flex items-center space-x-7">
             <a href="#products" className="text-brand-charcoal hover:text-brand-forest font-semibold text-sm transition-colors">
               {t('nav.products')}
             </a>
@@ -50,6 +50,9 @@ export const Navbar = ({ onOpenPortal }) => {
             <a href="#how-it-works" className="text-brand-charcoal hover:text-brand-forest font-semibold text-sm transition-colors">
               {t('nav.howItWorks')}
             </a>
+            <a href="#testimonials" className="text-brand-charcoal hover:text-brand-forest font-semibold text-sm transition-colors">
+              {language === 'sw' ? 'Ushuhuda' : 'Reviews'}
+            </a>
             <a href="#contact" className="text-brand-charcoal hover:text-brand-forest font-semibold text-sm transition-colors">
               {t('nav.contact')}
             </a>
@@ -58,7 +61,7 @@ export const Navbar = ({ onOpenPortal }) => {
           {/* Controls Area */}
           <div className="flex items-center space-x-2 sm:space-x-3">
             
-            {/* Desktop Currency Selector (Hidden on phones, available in Mobile Menu) */}
+            {/* Desktop Currency Selector */}
             <div className="hidden sm:inline-block relative text-left">
               <select
                 aria-label="Select Currency"
@@ -74,7 +77,7 @@ export const Navbar = ({ onOpenPortal }) => {
               </select>
             </div>
 
-            {/* Desktop Bilingual Switcher (Hidden on phones, available in Mobile Menu) */}
+            {/* Desktop Bilingual Switcher */}
             <div className="hidden sm:flex items-center bg-brand-surface p-1 rounded-xl border border-brand-leaf/30 shadow-sm">
               <button
                 type="button"
@@ -102,7 +105,7 @@ export const Navbar = ({ onOpenPortal }) => {
               </button>
             </div>
 
-            {/* Cart Button (Always visible on all screens) */}
+            {/* Cart Button */}
             <button
               type="button"
               onClick={() => setIsCartOpen(true)}
@@ -118,7 +121,7 @@ export const Navbar = ({ onOpenPortal }) => {
               )}
             </button>
 
-            {/* Mobile Hamburger Menu Toggle (Clean 44px touch target on phones) */}
+            {/* Mobile Hamburger Menu Toggle */}
             <button
               type="button"
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
@@ -142,7 +145,6 @@ export const Navbar = ({ onOpenPortal }) => {
                   <span>Language / Lugha:</span>
                 </span>
                 
-                {/* Large touch bilingual buttons */}
                 <div className="flex items-center bg-white p-1 rounded-xl border border-brand-leaf/30 shadow-sm">
                   <button
                     type="button"
@@ -189,7 +191,7 @@ export const Navbar = ({ onOpenPortal }) => {
               </div>
             </div>
 
-            {/* Navigation Links with Large Touch Targets */}
+            {/* Navigation Links */}
             <div className="space-y-1">
               <a 
                 href="#products" 
@@ -216,6 +218,14 @@ export const Navbar = ({ onOpenPortal }) => {
                 <ArrowRight className="w-4 h-4 text-brand-muted" />
               </a>
               <a 
+                href="#testimonials" 
+                onClick={() => setMobileMenuOpen(false)}
+                className="flex items-center justify-between px-4 py-3 text-sm font-bold text-brand-charcoal hover:bg-brand-surface hover:text-brand-forest rounded-2xl transition-colors"
+              >
+                <span>{language === 'sw' ? 'Ushuhuda wa Wateja' : 'Customer Reviews'}</span>
+                <ArrowRight className="w-4 h-4 text-brand-muted" />
+              </a>
+              <a 
                 href="#contact" 
                 onClick={() => setMobileMenuOpen(false)}
                 className="flex items-center justify-between px-4 py-3 text-sm font-bold text-brand-charcoal hover:bg-brand-surface hover:text-brand-forest rounded-2xl transition-colors"
@@ -225,7 +235,7 @@ export const Navbar = ({ onOpenPortal }) => {
               </a>
             </div>
 
-            {/* Fast WhatsApp Support Contact Banner */}
+            {/* Fast WhatsApp Support Banner */}
             <div className="pt-2 border-t border-brand-leaf/15">
               <a 
                 href="https://wa.me/255752613616" 

@@ -13,7 +13,8 @@ import {
   Clock,
   Menu,
   X,
-  Globe
+  Globe,
+  Heart
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useLanguage } from '../../context/LanguageContext';
@@ -25,6 +26,7 @@ import { BmsProducts } from './BmsProducts';
 import { BmsExpenses } from './BmsExpenses';
 import { BmsStaff } from './BmsStaff';
 import { BmsSettings } from './BmsSettings';
+import { BmsTestimonials } from './BmsTestimonials';
 
 export const BmsPortal = ({ onBackToStore }) => {
   const { t, language, setLanguage } = useLanguage();
@@ -82,6 +84,7 @@ export const BmsPortal = ({ onBackToStore }) => {
     { id: 'orders', label: t('bms.tabs.orders'), icon: Clock },
     { id: 'products', label: t('bms.tabs.products'), icon: Package },
     ...(isOwner ? [
+      { id: 'testimonials', label: language === 'sw' ? 'Ushuhuda wa Wateja' : 'Testimonials', icon: Heart },
       { id: 'expenses', label: t('bms.tabs.expenses'), icon: Receipt },
       { id: 'staff', label: t('bms.tabs.staff'), icon: Users },
       { id: 'settings', label: t('bms.tabs.settings'), icon: Settings }
@@ -91,12 +94,11 @@ export const BmsPortal = ({ onBackToStore }) => {
   return (
     <div className="min-h-screen bg-brand-surface flex flex-col">
       
-      {/* Top Navbar (Spacious and cleanly formatted for all phone widths) */}
+      {/* Top Navbar */}
       <header className="bg-white border-b border-brand-leaf/20 px-3.5 sm:px-6 py-2.5 sm:py-3 flex items-center justify-between sticky top-0 z-30 shadow-sm">
         
         {/* Left Side: Hamburger Menu + Logo + Brand Title */}
         <div className="flex items-center space-x-2.5">
-          {/* Mobile hamburger menu toggle */}
           <button
             type="button"
             onClick={() => setSidebarOpen(true)}
@@ -106,7 +108,7 @@ export const BmsPortal = ({ onBackToStore }) => {
             <Menu className="w-5 h-5" />
           </button>
 
-          {/* Desktop Back to Store Button (Moved into drawer on mobile to save space) */}
+          {/* Desktop Back to Store Button */}
           <button
             type="button"
             onClick={onBackToStore}
@@ -142,7 +144,7 @@ export const BmsPortal = ({ onBackToStore }) => {
             <span>{isOwner ? 'Admin' : 'Worker'}</span>
           </div>
 
-          {/* Desktop Bilingual Switcher (Available in mobile drawer for small screens) */}
+          {/* Desktop Bilingual Switcher */}
           <div className="hidden sm:flex items-center bg-brand-surface p-0.5 rounded-lg border border-brand-leaf/30 text-xs font-bold">
             <button
               type="button"
@@ -210,7 +212,7 @@ export const BmsPortal = ({ onBackToStore }) => {
               </button>
             </div>
 
-            {/* Quick Action: Back to Storefront (Prominent in mobile drawer) */}
+            {/* Quick Action: Back to Storefront */}
             <button
               type="button"
               onClick={() => {
@@ -247,7 +249,7 @@ export const BmsPortal = ({ onBackToStore }) => {
               </div>
             </div>
 
-            {/* Navigation Tabs with generous 48px touch targets */}
+            {/* Navigation Tabs */}
             <div className="space-y-1.5 pt-1">
               <span className="text-[10px] font-bold uppercase tracking-wider text-brand-muted px-2 block">
                 Management Modules
@@ -300,6 +302,7 @@ export const BmsPortal = ({ onBackToStore }) => {
           {activeTab === 'pos' && <BmsPOS />}
           {activeTab === 'orders' && <BmsOrders />}
           {activeTab === 'products' && <BmsProducts isReadOnly={!isOwner} />}
+          {activeTab === 'testimonials' && isOwner && <BmsTestimonials />}
           {activeTab === 'expenses' && isOwner && <BmsExpenses />}
           {activeTab === 'staff' && isOwner && <BmsStaff />}
           {activeTab === 'settings' && isOwner && <BmsSettings />}
