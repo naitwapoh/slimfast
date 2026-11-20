@@ -12,7 +12,8 @@ import {
   ShieldCheck, 
   Clock,
   Menu,
-  X
+  X,
+  Globe
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useLanguage } from '../../context/LanguageContext';
@@ -75,8 +76,6 @@ export const BmsPortal = ({ onBackToStore }) => {
   }
 
   // Navigation tabs defined by role permissions
-  // Workers have: POS, Orders, Products (read-only stock)
-  // Owners have: Dashboard, POS, Orders, Products (full edit), Expenses, Staff, Settings
   const tabs = [
     ...(isOwner ? [{ id: 'dashboard', label: t('bms.tabs.dashboard'), icon: LayoutDashboard }] : []),
     { id: 'pos', label: t('bms.tabs.pos'), icon: ShoppingCart },
@@ -92,68 +91,70 @@ export const BmsPortal = ({ onBackToStore }) => {
   return (
     <div className="min-h-screen bg-brand-surface flex flex-col">
       
-      {/* Top Navbar (Optimized for both phones and desktops) */}
-      <header className="bg-white border-b border-brand-leaf/20 px-3 sm:px-6 py-2.5 sm:py-3.5 flex items-center justify-between sticky top-0 z-30 shadow-sm">
-        <div className="flex items-center space-x-2 sm:space-x-3">
+      {/* Top Navbar (Spacious and cleanly formatted for all phone widths) */}
+      <header className="bg-white border-b border-brand-leaf/20 px-3.5 sm:px-6 py-2.5 sm:py-3 flex items-center justify-between sticky top-0 z-30 shadow-sm">
+        
+        {/* Left Side: Hamburger Menu + Logo + Brand Title */}
+        <div className="flex items-center space-x-2.5">
           {/* Mobile hamburger menu toggle */}
           <button
             type="button"
             onClick={() => setSidebarOpen(true)}
-            className="lg:hidden p-2 text-brand-charcoal hover:bg-brand-surface rounded-xl transition-colors"
-            aria-label="Open Management Menu"
+            className="lg:hidden p-2 text-brand-forest hover:bg-brand-surface rounded-xl bg-brand-surface/70 border border-brand-leaf/25 transition-colors"
+            aria-label="Open Navigation Menu"
           >
             <Menu className="w-5 h-5" />
           </button>
 
+          {/* Desktop Back to Store Button (Moved into drawer on mobile to save space) */}
           <button
             type="button"
             onClick={onBackToStore}
-            className="flex items-center space-x-1.5 text-xs font-bold text-brand-forest hover:text-brand-leaf transition-colors bg-brand-surface px-2.5 sm:px-3 py-1.5 rounded-lg border border-brand-leaf/20"
-            title="Scroll back to top of website"
+            className="hidden sm:flex items-center space-x-1.5 text-xs font-bold text-brand-forest hover:text-brand-leaf transition-colors bg-brand-surface px-3 py-1.5 rounded-xl border border-brand-leaf/20"
+            title="Return to customer storefront"
           >
             <ArrowLeft className="w-3.5 h-3.5" />
-            <span className="hidden sm:inline">Back to Store</span>
+            <span>Back to Store</span>
           </button>
 
-          <div className="flex items-center space-x-2 pl-1.5 sm:pl-2 border-l border-brand-leaf/20">
+          <div className="flex items-center space-x-2 sm:pl-2 sm:border-l sm:border-brand-leaf/20">
             <img 
               src="/logo.jpg" 
               alt="SLIMFAST Logo" 
-              className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg object-cover border border-brand-leaf/30 shrink-0"
+              className="w-8 h-8 rounded-lg object-cover border border-brand-leaf/30 shrink-0"
               onError={(e) => {
                 e.target.onerror = null;
                 e.target.src = 'https://i.postimg.cc/T3Pmj5Rf/Gemini-Generated-Image-omoe51omoe51omoe.jpg';
               }}
             />
-            <span className="text-sm sm:text-base font-black font-serif text-brand-forest tracking-wide truncate max-w-[120px] sm:max-w-none">
+            <span className="text-sm sm:text-base font-black font-serif text-brand-forest tracking-wide">
               SLIMFAST BMS
             </span>
           </div>
         </div>
 
-        {/* User Badge, Language Switcher & Logout */}
-        <div className="flex items-center space-x-1.5 sm:space-x-3">
+        {/* Right Side: Role Badge + Language + Sign Out */}
+        <div className="flex items-center space-x-2 sm:space-x-3">
           
           {/* Role Pill */}
-          <div className="flex items-center space-x-1 px-2 sm:px-3 py-1 rounded-full text-[11px] sm:text-xs font-bold bg-brand-surface border border-brand-leaf/30 text-brand-forest">
+          <div className="flex items-center space-x-1 px-2.5 py-1 rounded-full text-xs font-bold bg-brand-surface border border-brand-leaf/30 text-brand-forest">
             <ShieldCheck className="w-3.5 h-3.5 text-brand-leaf shrink-0" />
             <span>{isOwner ? 'Admin' : 'Worker'}</span>
-            <span className="text-[10px] text-brand-muted hidden md:inline">({userProfile?.name || userProfile?.email})</span>
           </div>
 
-          {/* Bilingual Switcher */}
-          <div className="flex items-center bg-brand-surface p-0.5 rounded-lg border border-brand-leaf/30 text-[11px] sm:text-xs font-bold">
+          {/* Desktop Bilingual Switcher (Available in mobile drawer for small screens) */}
+          <div className="hidden sm:flex items-center bg-brand-surface p-0.5 rounded-lg border border-brand-leaf/30 text-xs font-bold">
             <button
               type="button"
               onClick={() => setLanguage('en')}
-              className={`px-1.5 sm:px-2 py-0.5 rounded ${language === 'en' ? 'bg-brand-forest text-white' : 'text-brand-charcoal'}`}
+              className={`px-2 py-0.5 rounded ${language === 'en' ? 'bg-brand-forest text-white' : 'text-brand-charcoal'}`}
             >
               EN
             </button>
             <button
               type="button"
               onClick={() => setLanguage('sw')}
-              className={`px-1.5 sm:px-2 py-0.5 rounded ${language === 'sw' ? 'bg-brand-forest text-white' : 'text-brand-charcoal'}`}
+              className={`px-2 py-0.5 rounded ${language === 'sw' ? 'bg-brand-forest text-white' : 'text-brand-charcoal'}`}
             >
               SW
             </button>
@@ -163,7 +164,7 @@ export const BmsPortal = ({ onBackToStore }) => {
           <button
             type="button"
             onClick={logout}
-            className="p-1.5 sm:p-2 text-brand-muted hover:text-red-600 hover:bg-red-50 rounded-xl transition-colors"
+            className="p-2 text-brand-muted hover:text-red-600 hover:bg-red-50 rounded-xl transition-colors"
             title={t('bms.signOutBtn')}
             aria-label="Sign Out"
           >
@@ -178,34 +179,79 @@ export const BmsPortal = ({ onBackToStore }) => {
         {/* Mobile Backdrop for Sidebar Drawer */}
         {sidebarOpen && (
           <div 
-            className="fixed inset-0 z-40 bg-black/50 backdrop-blur-sm lg:hidden animate-fadeIn"
+            className="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm lg:hidden animate-fadeIn"
             onClick={() => setSidebarOpen(false)}
           />
         )}
 
-        {/* Sidebar Navigation (Slide-over drawer on mobile; static column on desktop) */}
+        {/* Sidebar Navigation Drawer */}
         <aside className={`
-          fixed inset-y-0 left-0 z-50 w-72 bg-white p-5 border-r border-brand-leaf/20 transform transition-transform duration-300 ease-in-out lg:static lg:transform-none lg:w-60 lg:rounded-3xl lg:border lg:shadow-sm lg:shrink-0 flex flex-col justify-between
+          fixed inset-y-0 left-0 z-50 w-72 sm:w-80 bg-white p-5 border-r border-brand-leaf/20 transform transition-transform duration-300 ease-in-out lg:static lg:transform-none lg:w-64 lg:rounded-3xl lg:border lg:shadow-sm lg:shrink-0 flex flex-col justify-between
           ${sidebarOpen ? 'translate-x-0 shadow-2xl' : '-translate-x-full lg:translate-x-0'}
         `}>
-          <div>
-            {/* Mobile Header inside Drawer */}
-            <div className="flex items-center justify-between pb-4 mb-4 border-b border-brand-leaf/20 lg:hidden">
-              <div className="flex items-center space-x-2">
+          <div className="space-y-4">
+            
+            {/* Drawer Header (Mobile Only) */}
+            <div className="flex items-center justify-between pb-3 border-b border-brand-leaf/20 lg:hidden">
+              <div className="flex items-center space-x-2.5">
                 <img src="/logo.jpg" alt="Logo" className="w-8 h-8 rounded-lg object-cover" />
-                <span className="font-serif font-black text-brand-forest">SLIMFAST BMS</span>
+                <div>
+                  <h3 className="font-serif font-black text-brand-forest text-sm">SLIMFAST BMS</h3>
+                  <span className="text-[10px] text-brand-muted block">{isOwner ? 'Master Administrator' : 'Staff Worker'}</span>
+                </div>
               </div>
               <button
                 type="button"
                 onClick={() => setSidebarOpen(false)}
                 className="p-2 text-brand-charcoal hover:bg-brand-surface rounded-xl"
+                aria-label="Close menu"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
-            {/* Navigation Tabs */}
-            <div className="space-y-1.5">
+            {/* Quick Action: Back to Storefront (Prominent in mobile drawer) */}
+            <button
+              type="button"
+              onClick={() => {
+                setSidebarOpen(false);
+                onBackToStore();
+              }}
+              className="w-full py-2.5 px-3 rounded-2xl bg-brand-surface border border-brand-leaf/30 text-brand-forest text-xs font-bold flex items-center justify-center space-x-2 hover:bg-brand-leaf/20 transition-colors lg:hidden"
+            >
+              <ArrowLeft className="w-3.5 h-3.5" />
+              <span>Back to Storefront</span>
+            </button>
+
+            {/* Mobile Language Switcher inside Drawer */}
+            <div className="p-3 bg-brand-surface/60 rounded-2xl border border-brand-leaf/20 flex items-center justify-between lg:hidden text-xs">
+              <span className="font-bold text-brand-charcoal flex items-center space-x-1.5">
+                <Globe className="w-3.5 h-3.5 text-brand-leaf" />
+                <span>Language:</span>
+              </span>
+              <div className="flex items-center bg-white p-0.5 rounded-xl border border-brand-leaf/30 font-bold">
+                <button
+                  type="button"
+                  onClick={() => setLanguage('en')}
+                  className={`px-2.5 py-1 rounded-lg text-xs transition-colors ${language === 'en' ? 'bg-brand-forest text-white' : 'text-brand-charcoal'}`}
+                >
+                  English
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setLanguage('sw')}
+                  className={`px-2.5 py-1 rounded-lg text-xs transition-colors ${language === 'sw' ? 'bg-brand-forest text-white' : 'text-brand-charcoal'}`}
+                >
+                  Kiswahili
+                </button>
+              </div>
+            </div>
+
+            {/* Navigation Tabs with generous 48px touch targets */}
+            <div className="space-y-1.5 pt-1">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-brand-muted px-2 block">
+                Management Modules
+              </span>
               {tabs.map((tab) => {
                 const Icon = tab.icon;
                 const isActive = activeTab === tab.id;
@@ -217,7 +263,7 @@ export const BmsPortal = ({ onBackToStore }) => {
                       setActiveTab(tab.id);
                       setSidebarOpen(false);
                     }}
-                    className={`w-full flex items-center space-x-3 px-3.5 py-3 rounded-2xl text-xs font-bold transition-all ${
+                    className={`w-full flex items-center space-x-3 px-3.5 py-3 rounded-2xl text-xs font-bold transition-all min-h-[46px] ${
                       isActive
                         ? 'bg-brand-forest text-white shadow-md'
                         : 'text-brand-charcoal hover:bg-brand-surface hover:text-brand-forest'
@@ -231,7 +277,7 @@ export const BmsPortal = ({ onBackToStore }) => {
             </div>
           </div>
 
-          {/* Bottom user details & quick actions */}
+          {/* Bottom user profile & Sign out */}
           <div className="pt-4 border-t border-brand-leaf/20 space-y-3">
             <div className="text-xs px-2">
               <p className="font-bold text-brand-charcoal truncate">{userProfile?.name || 'Administrator'}</p>
@@ -239,11 +285,11 @@ export const BmsPortal = ({ onBackToStore }) => {
             </div>
             <button
               type="button"
-              onClick={onBackToStore}
-              className="w-full py-2.5 px-3 rounded-xl bg-brand-surface border border-brand-leaf/20 text-brand-forest text-xs font-bold flex items-center justify-center space-x-2"
+              onClick={logout}
+              className="w-full py-2.5 px-3 rounded-2xl bg-red-50 text-red-600 text-xs font-bold flex items-center justify-center space-x-2 hover:bg-red-100 transition-colors"
             >
-              <ArrowLeft className="w-3.5 h-3.5" />
-              <span>Back to Storefront</span>
+              <LogOut className="w-3.5 h-3.5" />
+              <span>{t('bms.signOutBtn')}</span>
             </button>
           </div>
         </aside>
