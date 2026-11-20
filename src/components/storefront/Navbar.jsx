@@ -180,3 +180,4 @@ export const Navbar = ({ onOpenPortal }) => {
     </header>
   );
 };
+

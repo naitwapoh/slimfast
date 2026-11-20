@@ -134,3 +134,4 @@ export const ProductCard = ({ product, onViewDetails }) => {
     </div>
   );
 };
+

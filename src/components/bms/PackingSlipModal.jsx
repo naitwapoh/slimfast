@@ -146,3 +146,4 @@ export const PackingSlipModal = ({ order, onClose }) => {
     </div>
   );
 };
+

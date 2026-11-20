@@ -146,3 +146,4 @@ export const ProductDetailsModal = ({ product, onClose }) => {
     </div>
   );
 };
+

@@ -376,3 +376,4 @@ export const CheckoutModal = ({ onClose }) => {
     </div>
   );
 };
+
