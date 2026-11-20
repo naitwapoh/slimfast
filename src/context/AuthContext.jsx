@@ -1,136 +1,139 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { 
-  onAuthStateChanged, 
-  signInWithEmailAndPassword, 
-  createUserWithEmailAndPassword,
-  signOut 
-} from 'firebase/auth';
-import { 
-  doc, 
-  getDoc, 
-  setDoc, 
   collection, 
   getDocs, 
-  limit, 
-  query 
+  query, 
+  where, 
+  doc, 
+  setDoc 
 } from 'firebase/firestore';
-import { auth, db } from '../firebase';
+import { db } from '../firebase';
 
 const AuthContext = createContext();
 
+// Fixed Master Admin Credentials requested by business owner:
+// Name/Username: admin
+// Password: slimfast2026
+const ADMIN_USERNAME = 'admin';
+const ADMIN_PASSWORD = 'slimfast2026';
+
 export const AuthProvider = ({ children }) => {
-  const [currentUser, setCurrentUser] = useState(null);
-  const [userProfile, setUserProfile] = useState(null);
-  const [isFirstTimeSetup, setIsFirstTimeSetup] = useState(false);
-  const [loading, setLoading] = useState(true);
-
-  // Check if any users exist in Firestore
-  const checkFirstTimeSetup = async () => {
-    if (!db) {
-      setIsFirstTimeSetup(true);
-      return true;
-    }
+  const [currentUser, setCurrentUser] = useState(() => {
     try {
-      const q = query(collection(db, 'users'), limit(1));
-      const snap = await getDocs(q);
-      const isEmpty = snap.empty;
-      setIsFirstTimeSetup(isEmpty);
-      return isEmpty;
-    } catch (err) {
-      console.warn('First-time check notice:', err.message);
-      // If collection read failed, assume first time or allow registration
-      setIsFirstTimeSetup(false);
-      return false;
+      const stored = localStorage.getItem('slimfast_auth_session');
+      return stored ? JSON.parse(stored) : null;
+    } catch (e) {
+      return null;
     }
-  };
+  });
 
-  useEffect(() => {
-    checkFirstTimeSetup();
-  }, []);
-
-  useEffect(() => {
-    if (!auth) {
-      setLoading(false);
-      return;
+  const [userProfile, setUserProfile] = useState(() => {
+    try {
+      const stored = localStorage.getItem('slimfast_auth_session');
+      return stored ? JSON.parse(stored) : null;
+    } catch (e) {
+      return null;
     }
+  });
 
-    const unsubscribe = onAuthStateChanged(auth, async (user) => {
-      setCurrentUser(user);
-      if (user && db) {
-        try {
-          const userDocRef = doc(db, 'users', user.uid);
-          const snap = await getDoc(userDocRef);
-          if (snap.exists()) {
-            setUserProfile(snap.data());
-          } else {
-            // Check if this is the first user claiming owner
-            setUserProfile({
-              uid: user.uid,
-              email: user.email,
-              role: 'owner',
-              isActive: true,
-              name: user.displayName || user.email.split('@')[0],
-              createdAt: new Date().toISOString()
-            });
-          }
-        } catch (err) {
-          console.error('Error fetching user profile:', err);
-          setUserProfile(null);
-        }
-      } else {
-        setUserProfile(null);
-      }
-      setLoading(false);
-    });
+  const [loading, setLoading] = useState(false);
 
-    return () => unsubscribe();
-  }, []);
-
-  // Login handler
-  const login = async (email, password) => {
-    if (!auth) throw new Error('Firebase Auth is not initialized. Please verify your .env file.');
-    const userCredential = await signInWithEmailAndPassword(auth, email, password);
-    
-    // Check if account is active
+  // Sync admin record into Firestore if db available
+  useEffect(() => {
     if (db) {
-      const docSnap = await getDoc(doc(db, 'users', userCredential.user.uid));
-      if (docSnap.exists()) {
-        const data = docSnap.data();
-        if (data.isActive === false) {
-          await signOut(auth);
-          throw new Error('Your account has been deactivated by management.');
+      try {
+        setDoc(doc(db, 'users', 'master-admin'), {
+          uid: 'master-admin',
+          name: 'admin',
+          email: 'admin@slimfast.co.tz',
+          role: 'owner',
+          isActive: true,
+          updatedAt: new Date().toISOString()
+        }, { merge: true }).catch(() => {});
+      } catch (e) {}
+    }
+  }, []);
+
+  // Login handler supporting Master Admin & Worker accounts provisioned by Admin
+  const login = async (identifier, password) => {
+    setLoading(true);
+    const cleanId = (identifier || '').trim().toLowerCase();
+    const cleanPass = (password || '').trim();
+
+    // 1. Check Master Admin Credentials
+    if (
+      (cleanId === ADMIN_USERNAME || cleanId === 'admin@slimfast.co.tz' || cleanId === 'admin@slimfast.com') &&
+      cleanPass === ADMIN_PASSWORD
+    ) {
+      const adminSession = {
+        uid: 'master-admin',
+        name: 'admin',
+        email: 'admin@slimfast.co.tz',
+        role: 'owner',
+        isActive: true,
+        loginAt: new Date().toISOString()
+      };
+      setCurrentUser(adminSession);
+      setUserProfile(adminSession);
+      localStorage.setItem('slimfast_auth_session', JSON.stringify(adminSession));
+      setLoading(false);
+      return adminSession;
+    }
+
+    // 2. Check Worker Accounts registered by the Admin in Firestore
+    if (db) {
+      try {
+        const usersRef = collection(db, 'users');
+        const snap = await getDocs(usersRef);
+        let foundWorker = null;
+
+        snap.forEach(d => {
+          const data = d.data();
+          const emailMatch = data.email && data.email.toLowerCase() === cleanId;
+          const nameMatch = data.name && data.name.toLowerCase() === cleanId;
+          const passMatch = data.password === cleanPass || data.tempPassword === cleanPass;
+
+          if ((emailMatch || nameMatch) && passMatch) {
+            foundWorker = { id: d.id, ...data };
+          }
+        });
+
+        if (foundWorker) {
+          if (foundWorker.isActive === false) {
+            setLoading(false);
+            throw new Error('Your staff account has been deactivated by the admin.');
+          }
+
+          const workerSession = {
+            uid: foundWorker.id,
+            name: foundWorker.name || cleanId,
+            email: foundWorker.email || `${cleanId}@slimfast.co.tz`,
+            role: foundWorker.role || 'worker',
+            isActive: true,
+            loginAt: new Date().toISOString()
+          };
+
+          setCurrentUser(workerSession);
+          setUserProfile(workerSession);
+          localStorage.setItem('slimfast_auth_session', JSON.stringify(workerSession));
+          setLoading(false);
+          return workerSession;
         }
-        setUserProfile(data);
+      } catch (err) {
+        if (err.message && err.message.includes('deactivated')) throw err;
+        console.warn('Worker lookup error:', err);
       }
     }
-    return userCredential;
-  };
 
-  // Register first business owner
-  const registerFirstOwner = async (email, password, fullName = 'Business Owner') => {
-    if (!auth || !db) throw new Error('Firebase is not configured yet.');
-    const cred = await createUserWithEmailAndPassword(auth, email, password);
-    const profile = {
-      uid: cred.user.uid,
-      email: cred.user.email,
-      name: fullName,
-      role: 'owner',
-      isActive: true,
-      createdAt: new Date().toISOString()
-    };
-    await setDoc(doc(db, 'users', cred.user.uid), profile);
-    setUserProfile(profile);
-    setIsFirstTimeSetup(false);
-    return cred;
+    setLoading(false);
+    throw new Error('Invalid credentials. Only the admin can register staff accounts and assign passwords.');
   };
 
   // Logout handler
-  const logout = async () => {
-    if (auth) {
-      await signOut(auth);
-    }
+  const logout = () => {
     setCurrentUser(null);
     setUserProfile(null);
+    localStorage.removeItem('slimfast_auth_session');
   };
 
   const isOwner = userProfile?.role === 'owner';
@@ -145,10 +148,7 @@ export const AuthProvider = ({ children }) => {
       isOwner,
       isWorker,
       isAccountActive,
-      isFirstTimeSetup,
-      checkFirstTimeSetup,
       login,
-      registerFirstOwner,
       logout
     }}>
       {children}
@@ -163,4 +163,3 @@ export const useAuth = () => {
   }
   return context;
 };
-

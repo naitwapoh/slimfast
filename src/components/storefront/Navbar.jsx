@@ -12,29 +12,6 @@ export const Navbar = ({ onOpenPortal }) => {
 
   return (
     <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-brand-leaf/20 shadow-sm transition-all">
-      {/* Top Announcement Bar */}
-      <div className="bg-brand-forest text-white text-xs py-1.5 px-4 font-medium tracking-wide">
-        <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-2">
-          <div className="flex items-center space-x-2">
-            <span className="inline-block w-2 h-2 rounded-full bg-brand-leaf animate-pulse"></span>
-            <span>{t('hero.badge')}</span>
-          </div>
-          <div className="flex items-center space-x-4">
-            <a 
-              href="https://wa.me/255752613616" 
-              target="_blank" 
-              rel="noopener noreferrer" 
-              className="flex items-center hover:text-brand-leaf transition-colors"
-            >
-              <Phone className="w-3.5 h-3.5 mr-1" />
-              <span>WhatsApp: +255 752 613 616</span>
-            </a>
-            <span className="hidden md:inline text-brand-leaf">•</span>
-            <span className="hidden md:inline">Dar es Salaam • Nairobi • Kampala • Kigali</span>
-          </div>
-        </div>
-      </div>
-
       {/* Main Navbar */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-20">

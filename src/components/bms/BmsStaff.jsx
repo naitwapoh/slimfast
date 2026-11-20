@@ -1,15 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { Users, Plus, ShieldCheck, UserCheck, X, Clock, CheckCircle, AlertCircle } from 'lucide-react';
-import { collection, onSnapshot, doc, setDoc, updateDoc, addDoc } from 'firebase/firestore';
-import { createUserWithEmailAndPassword, getAuth } from 'firebase/auth';
-import { initializeApp } from 'firebase/app';
-import { db, auth, app } from '../../firebase';
+import { Users, Plus, ShieldCheck, Trash2, X, Clock, CheckCircle, AlertCircle, Key } from 'lucide-react';
+import { collection, onSnapshot, doc, setDoc, updateDoc, deleteDoc, addDoc } from 'firebase/firestore';
+import { db } from '../../firebase';
 import { useAuth } from '../../context/AuthContext';
 import { useLanguage } from '../../context/LanguageContext';
 
 export const BmsStaff = () => {
   const { t } = useLanguage();
-  const { isOwner, userProfile, currentUser } = useAuth();
+  const { isOwner, userProfile } = useAuth();
 
   const [staffList, setStaffList] = useState([]);
   const [auditLogs, setAuditLogs] = useState([]);
@@ -24,6 +22,7 @@ export const BmsStaff = () => {
   });
   const [createLoading, setCreateLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
+  const [successMsg, setSuccessMsg] = useState('');
 
   useEffect(() => {
     if (!db) {
@@ -34,7 +33,11 @@ export const BmsStaff = () => {
     // 1. Listen to staff in users collection
     const unsubStaff = onSnapshot(collection(db, 'users'), (snap) => {
       const list = [];
-      snap.forEach(d => list.push({ id: d.id, ...d.data() }));
+      snap.forEach(d => {
+        if (d.id !== 'master-admin') {
+          list.push({ id: d.id, ...d.data() });
+        }
+      });
       setStaffList(list);
       setLoading(false);
     });
@@ -63,7 +66,7 @@ export const BmsStaff = () => {
 
       await addDoc(collection(db, 'audit_logs'), {
         action: `${newStatus ? 'Activated' : 'Deactivated'} staff account for ${staffMember.name || staffMember.email}`,
-        performedBy: userProfile?.name || currentUser?.email || 'Owner',
+        performedBy: 'admin',
         timestamp: new Date().toISOString()
       });
     } catch (err) {
@@ -71,37 +74,50 @@ export const BmsStaff = () => {
     }
   };
 
+  const handleDeleteStaff = async (staffMember) => {
+    if (!isOwner || !db) return;
+    if (!window.confirm(`Are you sure you want to remove worker account for ${staffMember.name}?`)) return;
+    try {
+      await deleteDoc(doc(db, 'users', staffMember.id));
+      await addDoc(collection(db, 'audit_logs'), {
+        action: `Removed staff account: ${staffMember.name}`,
+        performedBy: 'admin',
+        timestamp: new Date().toISOString()
+      });
+    } catch (err) {
+      alert('Error deleting staff: ' + err.message);
+    }
+  };
+
+  // Admin registers worker and assigns them password
   const handleCreateWorker = async (e) => {
     e.preventDefault();
-    if (!isOwner || !formData.email || !formData.password || !db) return;
+    if (!isOwner || !formData.name || !formData.password || !db) return;
     setCreateLoading(true);
     setErrorMsg('');
+    setSuccessMsg('');
 
     try {
-      // Create a secondary app instance to avoid logging out the current owner session!
-      const secondaryApp = initializeApp(app.options, `WorkerCreation_${Date.now()}`);
-      const secondaryAuth = getAuth(secondaryApp);
-      
-      const cred = await createUserWithEmailAndPassword(secondaryAuth, formData.email, formData.password);
-      
+      const workerId = 'worker_' + Date.now();
       const newStaffDoc = {
-        uid: cred.user.uid,
-        name: formData.name || formData.email.split('@')[0],
-        email: formData.email,
-        role: formData.role,
+        name: formData.name.trim(),
+        email: (formData.email || `${formData.name.toLowerCase().replace(/\s+/g, '')}@slimfast.co.tz`).trim(),
+        password: formData.password.trim(),
+        role: formData.role || 'worker',
         isActive: true,
-        createdBy: userProfile?.name || currentUser?.email || 'Owner',
+        createdBy: 'admin',
         createdAt: new Date().toISOString()
       };
 
-      await setDoc(doc(db, 'users', cred.user.uid), newStaffDoc);
+      await setDoc(doc(db, 'users', workerId), newStaffDoc);
 
       await addDoc(collection(db, 'audit_logs'), {
-        action: `Created new ${formData.role} account for ${formData.name} (${formData.email})`,
-        performedBy: userProfile?.name || currentUser?.email || 'Owner',
+        action: `Admin registered worker: ${newStaffDoc.name} (Role: ${newStaffDoc.role})`,
+        performedBy: 'admin',
         timestamp: new Date().toISOString()
       });
 
+      setSuccessMsg(`Worker account for "${newStaffDoc.name}" registered successfully with assigned password!`);
       setFormData({ name: '', email: '', password: '', role: 'worker' });
       setModalOpen(false);
     } catch (err) {
@@ -122,7 +138,7 @@ export const BmsStaff = () => {
             {t('bms.staff.title')}
           </h2>
           <p className="text-xs text-brand-charcoal/70 mt-1">
-            {t('bms.staff.subtitle')}
+            Admin registers workers and assigns them their passwords.
           </p>
         </div>
 
@@ -133,22 +149,46 @@ export const BmsStaff = () => {
             className="px-4 py-2.5 rounded-xl bg-brand-forest hover:bg-brand-leaf text-white font-bold text-xs shadow-md flex items-center space-x-1.5 transition-all self-start sm:self-auto"
           >
             <Plus className="w-4 h-4" />
-            <span>{t('bms.staff.createWorker')}</span>
+            <span>Register New Worker</span>
           </button>
         )}
+      </div>
+
+      {successMsg && (
+        <div className="p-3 bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs rounded-xl flex items-center space-x-2">
+          <CheckCircle className="w-4 h-4 text-emerald-600 shrink-0" />
+          <span>{successMsg}</span>
+        </div>
+      )}
+
+      {/* Admin Identity Card */}
+      <div className="bg-brand-forest text-white p-5 rounded-2xl flex items-center justify-between border border-brand-leaf/30 shadow-sm">
+        <div className="flex items-center space-x-3.5">
+          <div className="w-11 h-11 rounded-xl bg-white/10 flex items-center justify-center text-brand-leaf border border-white/20 font-black">
+            A
+          </div>
+          <div>
+            <h4 className="text-sm font-bold">Admin (Business Owner)</h4>
+            <p className="text-xs text-white/70">Master Administrator: name: <code className="font-mono font-bold text-brand-leaf">admin</code></p>
+          </div>
+        </div>
+        <span className="px-3 py-1 rounded-full bg-brand-leaf text-white text-[10px] font-black uppercase">
+          Master Authority
+        </span>
       </div>
 
       {/* Staff Members List */}
       <div className="bg-white rounded-3xl border border-brand-leaf/25 shadow-sm overflow-hidden">
         <div className="p-5 border-b border-brand-leaf/20 bg-brand-surface flex items-center justify-between">
           <h3 className="text-sm font-bold font-serif text-brand-forest">
-            Authorized Personnel ({staffList.length})
+            Registered Shop Workers ({staffList.length})
           </h3>
+          <span className="text-xs text-brand-muted">Credentials issued by Admin</span>
         </div>
 
         {staffList.length === 0 ? (
           <div className="p-10 text-center text-xs text-brand-muted">
-            {t('bms.staff.emptyStaff')}
+            No shop workers registered yet. Click "+ Register New Worker" to create worker logins.
           </div>
         ) : (
           <div className="divide-y divide-brand-leaf/10">
@@ -156,36 +196,48 @@ export const BmsStaff = () => {
               <div key={member.id} className="p-4 sm:p-5 flex items-center justify-between gap-4 hover:bg-brand-surface/40 transition-colors">
                 <div className="flex items-center space-x-3.5">
                   <div className="w-10 h-10 rounded-xl bg-brand-surface flex items-center justify-center text-brand-forest border border-brand-leaf/20 font-bold">
-                    {(member.name || member.email || 'S')[0].toUpperCase()}
+                    {(member.name || 'W')[0].toUpperCase()}
                   </div>
                   <div>
                     <h4 className="text-sm font-bold text-brand-charcoal">
-                      {member.name || 'Staff Member'}
+                      {member.name}
                     </h4>
-                    <p className="text-xs text-brand-muted mt-0.5">{member.email}</p>
+                    <p className="text-xs text-brand-muted mt-0.5">
+                      Username/Email: <strong className="text-brand-charcoal">{member.email || member.name}</strong> • Password: <code className="font-mono bg-brand-surface px-1.5 py-0.5 rounded border border-brand-leaf/20">{member.password || '••••••'}</code>
+                    </p>
                     <div className="flex items-center space-x-2 mt-1">
                       <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-brand-surface text-brand-forest border border-brand-leaf/20">
-                        {member.role === 'owner' ? t('bms.roleOwner') : t('bms.roleWorker')}
+                        {member.role === 'owner' ? 'Owner' : 'Shop Worker'}
                       </span>
                       <span className={`text-[10px] font-bold ${member.isActive !== false ? 'text-emerald-700' : 'text-red-600'}`}>
-                        {member.isActive !== false ? t('bms.staff.statusActive') : t('bms.staff.statusInactive')}
+                        {member.isActive !== false ? 'Active' : 'Deactivated'}
                       </span>
                     </div>
                   </div>
                 </div>
 
-                {isOwner && member.uid !== currentUser?.uid && (
-                  <button
-                    type="button"
-                    onClick={() => handleToggleStaffStatus(member)}
-                    className={`px-3 py-1.5 rounded-lg text-xs font-bold border transition-colors ${
-                      member.isActive !== false
-                        ? 'border-red-200 text-red-700 hover:bg-red-50'
-                        : 'border-emerald-200 text-emerald-700 hover:bg-emerald-50'
-                    }`}
-                  >
-                    {member.isActive !== false ? 'Deactivate' : 'Activate'}
-                  </button>
+                {isOwner && (
+                  <div className="flex items-center space-x-2">
+                    <button
+                      type="button"
+                      onClick={() => handleToggleStaffStatus(member)}
+                      className={`px-3 py-1.5 rounded-lg text-xs font-bold border transition-colors ${
+                        member.isActive !== false
+                          ? 'border-amber-200 text-amber-700 hover:bg-amber-50'
+                          : 'border-emerald-200 text-emerald-700 hover:bg-emerald-50'
+                      }`}
+                    >
+                      {member.isActive !== false ? 'Deactivate' : 'Activate'}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleDeleteStaff(member)}
+                      className="p-1.5 rounded-lg text-brand-muted hover:text-red-600 transition-colors"
+                      title="Delete worker"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </div>
                 )}
               </div>
             ))}
@@ -226,7 +278,7 @@ export const BmsStaff = () => {
         )}
       </div>
 
-      {/* Add Worker Modal */}
+      {/* Register Worker Modal */}
       {modalOpen && (
         <div className="fixed inset-0 z-50 overflow-y-auto bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 animate-fadeIn">
           <div 
@@ -242,7 +294,7 @@ export const BmsStaff = () => {
             </button>
 
             <h3 className="text-xl font-bold font-serif text-brand-forest">
-              {t('bms.staff.createWorker')}
+              Register Worker & Assign Password
             </h3>
 
             {errorMsg && (
@@ -255,7 +307,7 @@ export const BmsStaff = () => {
             <form onSubmit={handleCreateWorker} className="space-y-4">
               <div>
                 <label className="block text-xs font-bold text-brand-charcoal mb-1">
-                  {t('bms.staff.workerName')} *
+                  Worker Name *
                 </label>
                 <input
                   type="text"
@@ -269,12 +321,11 @@ export const BmsStaff = () => {
 
               <div>
                 <label className="block text-xs font-bold text-brand-charcoal mb-1">
-                  {t('bms.staff.workerEmail')} *
+                  Worker Login Username / Email (Optional)
                 </label>
                 <input
-                  type="email"
-                  required
-                  placeholder="bakari@slimfast.co.tz"
+                  type="text"
+                  placeholder="e.g. bakari (will default to name if empty)"
                   value={formData.email}
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                   className="w-full px-3.5 py-2.5 rounded-xl border border-brand-leaf/30 text-xs bg-brand-surface/40"
@@ -283,30 +334,22 @@ export const BmsStaff = () => {
 
               <div>
                 <label className="block text-xs font-bold text-brand-charcoal mb-1">
-                  {t('bms.staff.temporaryPassword')} *
+                  Assign Password *
                 </label>
-                <input
-                  type="password"
-                  required
-                  placeholder="Minimum 6 characters"
-                  value={formData.password}
-                  onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-brand-leaf/30 text-xs bg-brand-surface/40"
-                />
-              </div>
-
-              <div>
-                <label className="block text-xs font-bold text-brand-charcoal mb-1">
-                  {t('bms.staff.assignRole')} *
-                </label>
-                <select
-                  value={formData.role}
-                  onChange={(e) => setFormData({ ...formData, role: e.target.value })}
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-brand-leaf/30 text-xs font-bold bg-brand-surface/40"
-                >
-                  <option value="worker">{t('bms.staff.roleWorker')}</option>
-                  <option value="owner">{t('bms.staff.roleOwner')}</option>
-                </select>
+                <div className="relative">
+                  <Key className="w-4 h-4 absolute left-3 top-3 text-brand-muted" />
+                  <input
+                    type="text"
+                    required
+                    placeholder="Enter password for this worker"
+                    value={formData.password}
+                    onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                    className="w-full pl-9 pr-3 py-2.5 rounded-xl border border-brand-leaf/30 text-xs bg-brand-surface/40 font-mono font-bold"
+                  />
+                </div>
+                <span className="text-[10px] text-brand-muted mt-1 block">
+                  Give this password to the worker so they can log into the POS & Order Fulfillment desk.
+                </span>
               </div>
 
               <div className="pt-2 flex justify-end space-x-2">
@@ -315,14 +358,14 @@ export const BmsStaff = () => {
                   onClick={() => setModalOpen(false)}
                   className="px-4 py-2 rounded-xl border text-xs font-bold text-brand-charcoal"
                 >
-                  {t('cancel')}
+                  Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={createLoading}
                   className="px-5 py-2 rounded-xl bg-brand-forest hover:bg-brand-leaf text-white text-xs font-bold shadow-md"
                 >
-                  {createLoading ? t('loading') : 'Register Staff'}
+                  {createLoading ? 'Registering...' : 'Register Worker'}
                 </button>
               </div>
             </form>
@@ -333,4 +376,3 @@ export const BmsStaff = () => {
     </div>
   );
 };
-

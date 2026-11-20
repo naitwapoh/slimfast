@@ -91,7 +91,7 @@ export const Hero = () => {
                       className="w-full h-full object-cover object-top transform group-hover:scale-105 transition-transform duration-700"
                       onError={(e) => {
                         e.target.onerror = null;
-                        e.target.src = 'https://i.postimg.cc/dtsTvZZQ/Gemini-Generated-Image-yyzsooyyzsooyyzs.jpg';
+                        e.target.src = 'https://lh3.googleusercontent.com/gg/AJWXcNfEFJjOWo1rUN172RiEFZ4s6i4HjXBUCbw5Qvo3TV2HBGpMrriRpB_YwQlbUWE0H1mZWEG1B7Y2DccIGOkWbLrAuAOQ8qtuUuUnnPSjvM2ebS1xMv874HRx43wyrY-dB3i5ht8J7VlV1FzwZbSeFwzgxkesRT9-dTtA1wjgSOPxDmFZ9fsr=s1024-rj';
                       }}
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/25 to-transparent flex flex-col justify-end p-5 text-white">

@@ -107,9 +107,10 @@ export const BmsPortal = ({ onBackToStore }) => {
             type="button"
             onClick={onBackToStore}
             className="flex items-center space-x-1.5 text-xs font-bold text-brand-forest hover:text-brand-leaf transition-colors bg-brand-surface px-3 py-1.5 rounded-lg border border-brand-leaf/20"
+            title="Scroll back to top of website"
           >
             <ArrowLeft className="w-3.5 h-3.5" />
-            <span className="hidden sm:inline">{t('backToStore')}</span>
+            <span className="hidden sm:inline">Back to Store</span>
           </button>
 
           <div className="flex items-center space-x-2 pl-2 border-l border-brand-leaf/20">
