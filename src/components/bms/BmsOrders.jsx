@@ -10,7 +10,8 @@ import {
   Trash2, 
   Phone, 
   MapPin,
-  AlertCircle
+  AlertCircle,
+  MessageSquare
 } from 'lucide-react';
 import { collection, onSnapshot, doc, updateDoc, deleteDoc, addDoc } from 'firebase/firestore';
 import { db } from '../../firebase';
@@ -114,20 +115,20 @@ export const BmsOrders = () => {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       
       {/* Title */}
       <div>
-        <h2 className="text-2xl font-black font-serif text-brand-forest">
+        <h2 className="text-xl sm:text-2xl font-black font-serif text-brand-forest">
           {t('bms.orders.title')}
         </h2>
-        <p className="text-xs text-brand-charcoal/70 mt-1">
+        <p className="text-xs text-brand-charcoal/70 mt-0.5 sm:mt-1">
           {t('bms.orders.subtitle')}
         </p>
       </div>
 
       {/* Search & Filter Controls */}
-      <div className="bg-white p-4 rounded-2xl border border-brand-leaf/25 shadow-sm flex flex-col sm:flex-row gap-3 items-center justify-between">
+      <div className="bg-white p-3 sm:p-4 rounded-2xl border border-brand-leaf/25 shadow-sm flex flex-col sm:flex-row gap-3 items-center justify-between">
         
         <div className="relative w-full sm:w-80">
           <Search className="w-4 h-4 absolute left-3 top-3 text-brand-muted" />
@@ -136,7 +137,7 @@ export const BmsOrders = () => {
             placeholder={t('bms.orders.searchPlaceholder')}
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-9 pr-3 py-2 rounded-xl border border-brand-leaf/30 text-xs text-brand-charcoal focus:outline-none focus:ring-2 focus:ring-brand-forest bg-brand-surface/40"
+            className="w-full pl-9 pr-3 py-2.5 rounded-xl border border-brand-leaf/30 text-xs text-brand-charcoal focus:outline-none focus:ring-2 focus:ring-brand-forest bg-brand-surface/40"
           />
         </div>
 
@@ -145,7 +146,7 @@ export const BmsOrders = () => {
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
-            className="px-3 py-2 rounded-xl border border-brand-leaf/30 text-xs font-bold text-brand-charcoal bg-brand-surface/40 focus:outline-none"
+            className="w-full sm:w-auto px-3 py-2 rounded-xl border border-brand-leaf/30 text-xs font-bold text-brand-charcoal bg-brand-surface/40 focus:outline-none"
           >
             <option value="ALL">All Statuses ({orders.length})</option>
             <option value="Pending">{t('bms.orders.statusPending')}</option>
@@ -165,11 +166,11 @@ export const BmsOrders = () => {
       ) : filteredOrders.length === 0 ? (
         
         /* Clean Empty Orders State */
-        <div className="bg-white rounded-3xl p-16 text-center border border-dashed border-brand-leaf/30 space-y-3">
-          <div className="w-16 h-16 mx-auto rounded-2xl bg-brand-surface flex items-center justify-center text-brand-muted">
-            <Clock className="w-8 h-8 text-brand-leaf" />
+        <div className="bg-white rounded-3xl p-10 sm:p-16 text-center border border-dashed border-brand-leaf/30 space-y-3">
+          <div className="w-14 h-14 sm:w-16 sm:h-16 mx-auto rounded-2xl bg-brand-surface flex items-center justify-center text-brand-muted">
+            <Clock className="w-7 h-7 sm:w-8 sm:h-8 text-brand-leaf" />
           </div>
-          <h3 className="text-lg font-bold font-serif text-brand-forest">
+          <h3 className="text-base sm:text-lg font-bold font-serif text-brand-forest">
             {t('bms.orders.emptyOrders')}
           </h3>
           <p className="text-xs text-brand-charcoal/70 max-w-sm mx-auto">
@@ -179,130 +180,240 @@ export const BmsOrders = () => {
 
       ) : (
 
-        <div className="bg-white rounded-3xl border border-brand-leaf/25 shadow-sm overflow-hidden">
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-xs">
-              <thead className="bg-brand-surface font-bold text-brand-forest border-b border-brand-leaf/20">
-                <tr>
-                  <th className="p-4">{t('bms.orders.orderId')}</th>
-                  <th className="p-4">{t('bms.orders.customer')}</th>
-                  <th className="p-4">{t('bms.orders.location')}</th>
-                  <th className="p-4">{t('bms.orders.items')}</th>
-                  <th className="p-4">{t('bms.orders.total')}</th>
-                  <th className="p-4">{t('status')}</th>
-                  <th className="p-4 text-right">{t('actions')}</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-brand-leaf/10">
-                {filteredOrders.map((ord) => (
-                  <tr key={ord.id} className="hover:bg-brand-surface/40 transition-colors">
-                    
-                    {/* Order ID & Date */}
-                    <td className="p-4">
-                      <span className="font-mono font-bold text-brand-forest block">
-                        #{ord.orderId}
-                      </span>
-                      <span className="text-[10px] text-brand-muted block mt-0.5">
-                        {new Date(ord.createdAt).toLocaleDateString()}
-                      </span>
-                      <span className="inline-block mt-1 px-1.5 py-0.5 bg-brand-surface text-[9px] font-bold uppercase rounded border border-brand-leaf/20">
-                        {ord.channel === 'pos' ? 'POS Counter' : 'Online Store'}
-                      </span>
-                    </td>
+        <>
+          {/* MOBILE CARD VIEW: Designed specifically for smartphones */}
+          <div className="block md:hidden space-y-3">
+            {filteredOrders.map((ord) => (
+              <div 
+                key={ord.id} 
+                className="bg-white rounded-2xl p-4 border border-brand-leaf/25 shadow-sm space-y-3"
+              >
+                {/* Header: Order ID, Channel & Status */}
+                <div className="flex items-start justify-between gap-2 border-b border-brand-leaf/15 pb-2.5">
+                  <div>
+                    <span className="font-mono font-black text-brand-forest text-sm block">
+                      #{ord.orderId}
+                    </span>
+                    <span className="text-[10px] text-brand-muted">
+                      {new Date(ord.createdAt).toLocaleDateString()}
+                    </span>
+                    <span className="inline-block ml-1.5 px-1.5 py-0.5 bg-brand-surface text-[9px] font-bold uppercase rounded border border-brand-leaf/20">
+                      {ord.channel === 'pos' ? 'POS Counter' : 'Online Store'}
+                    </span>
+                  </div>
 
-                    {/* Customer & Phone */}
-                    <td className="p-4">
-                      <span className="font-bold text-brand-charcoal block">
-                        {ord.customerName}
-                      </span>
-                      <a 
-                        href={`https://wa.me/${(ord.phoneNumber || '').replace(/[^0-9]/g, '')}`}
-                        target="_blank" 
-                        rel="noopener noreferrer" 
-                        className="text-[11px] text-brand-leaf hover:underline flex items-center space-x-1 mt-0.5"
-                      >
-                        <Phone className="w-3 h-3" />
-                        <span>{ord.phoneNumber}</span>
-                      </a>
-                    </td>
+                  {/* Status Dropdown */}
+                  <select
+                    value={ord.status || 'Pending'}
+                    onChange={(e) => handleUpdateStatus(ord.id, e.target.value)}
+                    className={`px-2 py-1 rounded-lg text-xs font-bold border focus:outline-none cursor-pointer ${getStatusColor(ord.status)}`}
+                  >
+                    <option value="Pending">Pending</option>
+                    <option value="Confirmed">Confirmed</option>
+                    <option value="Dispatched">Dispatched</option>
+                    <option value="Delivered">Delivered</option>
+                  </select>
+                </div>
 
-                    {/* Location */}
-                    <td className="p-4">
-                      <div className="flex items-center space-x-1 font-semibold text-brand-charcoal">
-                        <MapPin className="w-3.5 h-3.5 text-brand-muted shrink-0" />
-                        <span>{ord.city}, {ord.country}</span>
-                      </div>
-                      <span className="text-[10px] text-brand-muted block truncate max-w-xs mt-0.5">
-                        {ord.address}
-                      </span>
-                    </td>
+                {/* Customer Details */}
+                <div className="flex items-center justify-between text-xs">
+                  <div>
+                    <span className="font-bold text-brand-charcoal block">
+                      {ord.customerName}
+                    </span>
+                    <div className="flex items-center space-x-1 text-brand-muted text-[11px] mt-0.5">
+                      <MapPin className="w-3 h-3 text-brand-leaf shrink-0" />
+                      <span>{ord.city}, {ord.country}</span>
+                    </div>
+                  </div>
 
-                    {/* Items */}
-                    <td className="p-4">
-                      <div className="space-y-0.5">
-                        {(ord.items || []).map((it, idx) => (
-                          <div key={idx} className="text-brand-charcoal">
-                            <strong>{it.quantity}x</strong> {it.name}
-                          </div>
-                        ))}
-                      </div>
-                    </td>
+                  {/* WhatsApp Quick Chat */}
+                  {ord.phoneNumber && (
+                    <a
+                      href={`https://wa.me/${ord.phoneNumber.replace(/[^0-9]/g, '')}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="px-2.5 py-1.5 bg-[#25D366]/10 text-[#128C7E] font-bold text-xs rounded-xl flex items-center space-x-1 border border-[#25D366]/30"
+                    >
+                      <MessageSquare className="w-3.5 h-3.5" />
+                      <span>WhatsApp</span>
+                    </a>
+                  )}
+                </div>
 
-                    {/* Total & Payment */}
-                    <td className="p-4">
-                      <div className="font-black text-brand-forest text-sm">
-                        {formatPrice(ord.totalTZS, ord.currency)}
-                      </div>
-                      <div className="text-[10px] text-brand-muted mt-0.5">
-                        {ord.paymentMethod}
-                      </div>
-                    </td>
+                {/* Address */}
+                {ord.address && (
+                  <div className="text-[11px] text-brand-muted bg-brand-surface/60 p-2 rounded-lg">
+                    {ord.address}
+                  </div>
+                )}
 
-                    {/* Status Dropdown */}
-                    <td className="p-4">
-                      <select
-                        value={ord.status || 'Pending'}
-                        onChange={(e) => handleUpdateStatus(ord.id, e.target.value)}
-                        className={`px-2.5 py-1 rounded-lg text-xs font-bold border focus:outline-none cursor-pointer ${getStatusColor(ord.status)}`}
-                      >
-                        <option value="Pending">Pending</option>
-                        <option value="Confirmed">Confirmed</option>
-                        <option value="Dispatched">Dispatched</option>
-                        <option value="Delivered">Delivered</option>
-                      </select>
-                    </td>
+                {/* Items & Total */}
+                <div className="bg-brand-surface p-2.5 rounded-xl space-y-1 text-xs">
+                  {(ord.items || []).map((it, idx) => (
+                    <div key={idx} className="flex justify-between text-brand-charcoal">
+                      <span><strong>{it.quantity}x</strong> {it.name}</span>
+                    </div>
+                  ))}
+                  <div className="border-t border-brand-leaf/20 pt-1.5 flex justify-between font-bold text-brand-forest">
+                    <span>Total ({ord.paymentMethod}):</span>
+                    <span className="text-sm font-black">{formatPrice(ord.totalTZS, ord.currency)}</span>
+                  </div>
+                </div>
 
-                    {/* Actions: Print Slip & Owner Delete */}
-                    <td className="p-4 text-right">
-                      <div className="flex items-center justify-end space-x-2">
-                        <button
-                          type="button"
-                          onClick={() => setSelectedPackingSlipOrder(ord)}
-                          className="p-2 rounded-xl bg-brand-surface hover:bg-brand-forest hover:text-white text-brand-forest border border-brand-leaf/30 transition-colors"
-                          title="Print Packing Slip"
+                {/* Actions: Packing Slip & Delete */}
+                <div className="flex items-center justify-between pt-1">
+                  <button
+                    type="button"
+                    onClick={() => setSelectedPackingSlipOrder(ord)}
+                    className="flex-1 py-2 px-3 rounded-xl bg-brand-forest text-white text-xs font-bold flex items-center justify-center space-x-1.5 shadow-sm"
+                  >
+                    <Printer className="w-3.5 h-3.5" />
+                    <span>Print Packing Slip</span>
+                  </button>
+
+                  {isOwner && (
+                    <button
+                      type="button"
+                      onClick={() => handleDeleteOrder(ord.id)}
+                      className="p-2 ml-2 rounded-xl text-brand-muted hover:text-red-600 border border-brand-leaf/20 hover:bg-red-50"
+                      title="Delete order"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* DESKTOP TABLE VIEW: For tablet and desktop screens */}
+          <div className="hidden md:block bg-white rounded-3xl border border-brand-leaf/25 shadow-sm overflow-hidden">
+            <div className="overflow-x-auto">
+              <table className="w-full text-left text-xs">
+                <thead className="bg-brand-surface font-bold text-brand-forest border-b border-brand-leaf/20">
+                  <tr>
+                    <th className="p-4">{t('bms.orders.orderId')}</th>
+                    <th className="p-4">{t('bms.orders.customer')}</th>
+                    <th className="p-4">{t('bms.orders.location')}</th>
+                    <th className="p-4">{t('bms.orders.items')}</th>
+                    <th className="p-4">{t('bms.orders.total')}</th>
+                    <th className="p-4">{t('status')}</th>
+                    <th className="p-4 text-right">{t('actions')}</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-brand-leaf/10">
+                  {filteredOrders.map((ord) => (
+                    <tr key={ord.id} className="hover:bg-brand-surface/40 transition-colors">
+                      
+                      {/* Order ID & Date */}
+                      <td className="p-4">
+                        <span className="font-mono font-bold text-brand-forest block">
+                          #{ord.orderId}
+                        </span>
+                        <span className="text-[10px] text-brand-muted block mt-0.5">
+                          {new Date(ord.createdAt).toLocaleDateString()}
+                        </span>
+                        <span className="inline-block mt-1 px-1.5 py-0.5 bg-brand-surface text-[9px] font-bold uppercase rounded border border-brand-leaf/20">
+                          {ord.channel === 'pos' ? 'POS Counter' : 'Online Store'}
+                        </span>
+                      </td>
+
+                      {/* Customer & Phone */}
+                      <td className="p-4">
+                        <span className="font-bold text-brand-charcoal block">
+                          {ord.customerName}
+                        </span>
+                        <a 
+                          href={`https://wa.me/${(ord.phoneNumber || '').replace(/[^0-9]/g, '')}`}
+                          target="_blank" 
+                          rel="noopener noreferrer" 
+                          className="text-[11px] text-brand-leaf hover:underline flex items-center space-x-1 mt-0.5"
                         >
-                          <Printer className="w-4 h-4" />
-                        </button>
+                          <Phone className="w-3 h-3" />
+                          <span>{ord.phoneNumber}</span>
+                        </a>
+                      </td>
 
-                        {isOwner && (
+                      {/* Location */}
+                      <td className="p-4">
+                        <div className="flex items-center space-x-1 font-semibold text-brand-charcoal">
+                          <MapPin className="w-3.5 h-3.5 text-brand-muted shrink-0" />
+                          <span>{ord.city}, {ord.country}</span>
+                        </div>
+                        <span className="text-[10px] text-brand-muted block truncate max-w-xs mt-0.5">
+                          {ord.address}
+                        </span>
+                      </td>
+
+                      {/* Items */}
+                      <td className="p-4">
+                        <div className="space-y-0.5">
+                          {(ord.items || []).map((it, idx) => (
+                            <div key={idx} className="text-brand-charcoal">
+                              <strong>{it.quantity}x</strong> {it.name}
+                            </div>
+                          ))}
+                        </div>
+                      </td>
+
+                      {/* Total & Payment */}
+                      <td className="p-4">
+                        <div className="font-black text-brand-forest text-sm">
+                          {formatPrice(ord.totalTZS, ord.currency)}
+                        </div>
+                        <div className="text-[10px] text-brand-muted mt-0.5">
+                          {ord.paymentMethod}
+                        </div>
+                      </td>
+
+                      {/* Status Dropdown */}
+                      <td className="p-4">
+                        <select
+                          value={ord.status || 'Pending'}
+                          onChange={(e) => handleUpdateStatus(ord.id, e.target.value)}
+                          className={`px-2.5 py-1 rounded-lg text-xs font-bold border focus:outline-none cursor-pointer ${getStatusColor(ord.status)}`}
+                        >
+                          <option value="Pending">Pending</option>
+                          <option value="Confirmed">Confirmed</option>
+                          <option value="Dispatched">Dispatched</option>
+                          <option value="Delivered">Delivered</option>
+                        </select>
+                      </td>
+
+                      {/* Actions: Print Slip & Owner Delete */}
+                      <td className="p-4 text-right">
+                        <div className="flex items-center justify-end space-x-2">
                           <button
                             type="button"
-                            onClick={() => handleDeleteOrder(ord.id)}
-                            className="p-2 rounded-xl text-brand-muted hover:text-red-600 hover:bg-red-50 transition-colors"
-                            title="Delete Order Record"
+                            onClick={() => setSelectedPackingSlipOrder(ord)}
+                            className="p-2 rounded-xl bg-brand-surface hover:bg-brand-forest hover:text-white text-brand-forest border border-brand-leaf/30 transition-colors"
+                            title={t('bms.orders.printSlip')}
                           >
-                            <Trash2 className="w-4 h-4" />
+                            <Printer className="w-4 h-4" />
                           </button>
-                        )}
-                      </div>
-                    </td>
 
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+                          {isOwner && (
+                            <button
+                              type="button"
+                              onClick={() => handleDeleteOrder(ord.id)}
+                              className="p-2 rounded-xl text-brand-muted hover:text-red-600 hover:bg-red-50 transition-colors"
+                              title="Delete Order"
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </button>
+                          )}
+                        </div>
+                      </td>
+
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </div>
-        </div>
+        </>
+
       )}
 
       {/* Packing Slip Modal */}
@@ -316,4 +427,3 @@ export const BmsOrders = () => {
     </div>
   );
 };
-

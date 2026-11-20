@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { X, CheckCircle, Phone, MapPin, CreditCard, MessageSquare, AlertCircle } from 'lucide-react';
-import { collection, addDoc, doc, updateDoc, increment, serverTimestamp } from 'firebase/firestore';
+import { collection, addDoc, doc, updateDoc, increment } from 'firebase/firestore';
 import { db } from '../../firebase';
 import { useLanguage } from '../../context/LanguageContext';
 import { useCurrency } from '../../context/CurrencyContext';
@@ -128,7 +128,7 @@ export const CheckoutModal = ({ onClose }) => {
   };
 
   return (
-    <div className="fixed inset-0 z-50 overflow-y-auto bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 sm:p-6 animate-fadeIn">
+    <div className="fixed inset-0 z-50 overflow-y-auto bg-black/60 backdrop-blur-sm flex items-center justify-center p-3 sm:p-6 animate-fadeIn">
       <div 
         className="bg-white rounded-3xl max-w-xl w-full max-h-[92vh] overflow-y-auto shadow-2xl border border-brand-leaf/30 relative"
         onClick={(e) => e.stopPropagation()}
@@ -137,7 +137,8 @@ export const CheckoutModal = ({ onClose }) => {
         <button
           type="button"
           onClick={onClose}
-          className="absolute top-5 right-5 p-2 rounded-full bg-brand-surface hover:bg-brand-leaf/20 text-brand-charcoal transition-colors z-10"
+          className="absolute top-4 right-4 sm:top-5 sm:right-5 p-2 rounded-full bg-brand-surface hover:bg-brand-leaf/20 text-brand-charcoal transition-colors z-10"
+          aria-label="Close modal"
         >
           <X className="w-5 h-5" />
         </button>
@@ -145,99 +146,97 @@ export const CheckoutModal = ({ onClose }) => {
         {completedOrder ? (
           
           /* Order Success View */
-          <div className="p-8 text-center space-y-6">
-            <div className="w-20 h-20 mx-auto rounded-full bg-brand-forest/10 border border-brand-leaf/30 flex items-center justify-center text-brand-forest">
-              <CheckCircle className="w-10 h-10 text-brand-leaf animate-bounce" />
+          <div className="p-6 sm:p-8 text-center space-y-5 sm:space-y-6">
+            <div className="w-16 h-16 sm:w-20 sm:h-20 mx-auto rounded-full bg-brand-forest/10 border border-brand-leaf/30 flex items-center justify-center text-brand-forest">
+              <CheckCircle className="w-8 h-8 sm:w-10 sm:h-10 text-brand-leaf animate-bounce" />
             </div>
 
-            <div>
-              <span className="text-xs uppercase font-extrabold text-brand-leaf tracking-wider block">
-                SLIMFAST Pan-African Dispatch
+            <div className="space-y-1.5">
+              <span className="text-[11px] font-bold uppercase tracking-wider text-brand-leaf">
+                {t('checkout.successBadge')}
               </span>
-              <h2 className="text-2xl sm:text-3xl font-black font-serif text-brand-forest mt-1">
-                {t('checkout.orderSuccessTitle')}
-              </h2>
-              <p className="text-sm text-brand-charcoal/80 mt-2 max-w-md mx-auto leading-relaxed">
-                {t('checkout.orderSuccessDesc', { orderId: completedOrder.orderId })}
+              <h3 className="text-xl sm:text-2xl font-black font-serif text-brand-forest">
+                {t('checkout.successTitle')}
+              </h3>
+              <p className="text-xs sm:text-sm text-brand-charcoal/80 max-w-md mx-auto">
+                {t('checkout.successSubtitle')}
               </p>
             </div>
 
-            {/* Order Recap Box */}
-            <div className="bg-brand-surface rounded-2xl p-5 text-left text-xs space-y-2 border border-brand-leaf/20">
-              <div className="flex justify-between">
-                <span className="text-brand-muted">Order ID:</span>
-                <span className="font-bold text-brand-forest">#{completedOrder.orderId}</span>
+            {/* Order Card Preview */}
+            <div className="bg-brand-surface p-4 rounded-2xl border border-brand-leaf/30 text-left space-y-2 text-xs">
+              <div className="flex justify-between border-b border-brand-leaf/20 pb-2">
+                <span className="font-bold text-brand-muted">Order ID:</span>
+                <span className="font-mono font-black text-brand-forest">#{completedOrder.orderId}</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-brand-muted">Recipient:</span>
-                <span className="font-bold">{completedOrder.customerName}</span>
+                <span className="font-bold text-brand-charcoal">{completedOrder.customerName}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-brand-muted">Phone / WhatsApp:</span>
+                <span className="font-bold text-brand-charcoal">{completedOrder.phoneNumber}</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-brand-muted">Destination:</span>
-                <span className="font-bold">{completedOrder.city}, {completedOrder.country}</span>
+                <span className="font-bold text-brand-charcoal">{completedOrder.city}, {completedOrder.country}</span>
               </div>
-              <div className="flex justify-between">
-                <span className="text-brand-muted">Total:</span>
-                <span className="font-extrabold text-brand-forest text-sm">
-                  {formatPrice(completedOrder.totalTZS, completedOrder.currency)}
-                </span>
+              <div className="flex justify-between pt-2 border-t border-brand-leaf/20 text-sm font-bold">
+                <span className="text-brand-forest">Total Payable:</span>
+                <span className="text-brand-leaf font-black">{formatPrice(completedOrder.totalTZS, completedOrder.currency)}</span>
               </div>
             </div>
 
-            {/* WhatsApp Confirmation & Payment Action Button */}
-            <div className="p-3 bg-emerald-50 rounded-xl border border-emerald-200 text-xs text-emerald-900 text-left space-y-1">
-              <p className="font-bold">WhatsApp Payment Desk: <span className="font-mono text-brand-forest">+255 752 613 616</span></p>
-              <p className="text-[11px] text-emerald-800">Send your order confirmation and Mobile Money payment (M-Pesa, Tigo Pesa, Airtel Money) directly via WhatsApp below.</p>
+            {/* Click to WhatsApp CTA Button */}
+            <div className="space-y-3 pt-2">
+              <a
+                href={generateWhatsAppLink()}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-full py-4 rounded-2xl bg-[#25D366] hover:bg-[#20ba59] text-white font-extrabold text-sm sm:text-base shadow-lg flex items-center justify-center space-x-2 transition-all transform hover:scale-[1.02]"
+              >
+                <MessageSquare className="w-5 h-5 fill-current" />
+                <span>{t('checkout.confirmWhatsAppBtn')}</span>
+              </a>
+              <p className="text-[11px] text-brand-muted">
+                Pre-filled order directed to SLIMFAST Dispatch: <strong className="text-brand-forest">+255 752 613 616</strong>
+              </p>
             </div>
 
-            <a
-              href={generateWhatsAppLink()}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="w-full py-4 rounded-xl bg-[#25D366] hover:bg-[#20ba59] text-white font-extrabold text-sm shadow-md flex items-center justify-center space-x-2 transition-all transform hover:scale-[1.02]"
-            >
-              <MessageSquare className="w-5 h-5 fill-current" />
-              <span>Make Payment & Confirm Order via WhatsApp</span>
-            </a>
-
-            <button
-              type="button"
-              onClick={onClose}
-              className="text-xs font-bold text-brand-muted hover:text-brand-forest transition-colors"
-            >
-              {t('checkout.backToShop')}
-            </button>
+            <div className="pt-2">
+              <button
+                type="button"
+                onClick={onClose}
+                className="text-xs text-brand-charcoal hover:underline"
+              >
+                Return to Store
+              </button>
+            </div>
           </div>
 
         ) : (
 
-          /* Pan-African Checkout Form */
-          <form onSubmit={handleSubmitOrder} className="p-6 sm:p-8 space-y-6">
-            <div>
-              <span className="text-xs uppercase font-extrabold text-brand-leaf tracking-wider block">
-                Express Checkout
-              </span>
-              <h2 className="text-2xl sm:text-3xl font-black font-serif text-brand-forest">
+          /* Checkout Form */
+          <div className="p-5 sm:p-8">
+            <div className="mb-5 sm:mb-6 pr-8">
+              <h3 className="text-xl sm:text-2xl font-black font-serif text-brand-forest">
                 {t('checkout.title')}
-              </h2>
+              </h3>
               <p className="text-xs text-brand-charcoal/70 mt-1">
                 {t('checkout.subtitle')}
               </p>
             </div>
 
             {errorMessage && (
-              <div className="p-3 bg-red-50 border border-red-200 text-red-700 text-xs rounded-xl flex items-center space-x-2">
+              <div className="mb-4 p-3 bg-red-50 border border-red-200 text-red-700 text-xs rounded-xl flex items-center space-x-2">
                 <AlertCircle className="w-4 h-4 shrink-0" />
                 <span>{errorMessage}</span>
               </div>
             )}
 
-            {/* Customer Information */}
-            <div className="space-y-3">
-              <h4 className="text-xs font-extrabold uppercase text-brand-forest tracking-wider">
-                {t('checkout.customerInfo')}
-              </h4>
-
+            <form onSubmit={handleSubmitOrder} className="space-y-4">
+              
+              {/* Full Name */}
               <div>
                 <label className="block text-xs font-bold text-brand-charcoal mb-1">
                   {t('checkout.fullName')} *
@@ -245,38 +244,34 @@ export const CheckoutModal = ({ onClose }) => {
                 <input
                   type="text"
                   required
-                  placeholder={t('checkout.fullNamePlaceholder')}
+                  placeholder="e.g. Grace Mwangi"
                   value={formData.fullName}
                   onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-brand-leaf/30 text-xs text-brand-charcoal focus:ring-2 focus:ring-brand-forest focus:outline-none bg-brand-surface/40"
+                  className="w-full px-3.5 py-2.5 sm:py-3 rounded-xl border border-brand-leaf/30 text-xs sm:text-sm focus:ring-2 focus:ring-brand-forest focus:outline-none bg-brand-surface/30"
                 />
               </div>
 
+              {/* Phone / WhatsApp */}
               <div>
                 <label className="block text-xs font-bold text-brand-charcoal mb-1">
-                  {t('checkout.phoneNumber')} *
+                  {t('checkout.phone')} (WhatsApp) *
                 </label>
-                <input
-                  type="tel"
-                  required
-                  placeholder={t('checkout.phoneNumberPlaceholder')}
-                  value={formData.phone}
-                  onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-brand-leaf/30 text-xs text-brand-charcoal focus:ring-2 focus:ring-brand-forest focus:outline-none bg-brand-surface/40"
-                />
-                <span className="text-[10px] text-brand-muted mt-1 block">
-                  {t('checkout.phoneHelp')}
-                </span>
+                <div className="relative">
+                  <Phone className="w-4 h-4 absolute left-3 top-3 text-brand-muted" />
+                  <input
+                    type="tel"
+                    inputMode="tel"
+                    required
+                    placeholder="+255 752 613 616 / +254 7..."
+                    value={formData.phone}
+                    onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                    className="w-full pl-9 pr-3.5 py-2.5 sm:py-3 rounded-xl border border-brand-leaf/30 text-xs sm:text-sm focus:ring-2 focus:ring-brand-forest focus:outline-none bg-brand-surface/30"
+                  />
+                </div>
               </div>
-            </div>
 
-            {/* Delivery Address */}
-            <div className="space-y-3 pt-2 border-t border-brand-leaf/20">
-              <h4 className="text-xs font-extrabold uppercase text-brand-forest tracking-wider">
-                {t('checkout.deliveryAddress')}
-              </h4>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              {/* Country & City Grid */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                 <div>
                   <label className="block text-xs font-bold text-brand-charcoal mb-1">
                     {t('checkout.country')} *
@@ -284,7 +279,7 @@ export const CheckoutModal = ({ onClose }) => {
                   <select
                     value={formData.country}
                     onChange={(e) => setFormData({ ...formData, country: e.target.value })}
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-brand-leaf/30 text-xs text-brand-charcoal focus:ring-2 focus:ring-brand-forest focus:outline-none bg-brand-surface/40"
+                    className="w-full px-3.5 py-2.5 sm:py-3 rounded-xl border border-brand-leaf/30 text-xs sm:text-sm focus:ring-2 focus:ring-brand-forest focus:outline-none bg-brand-surface/30"
                   >
                     {countries.map((c) => (
                       <option key={c} value={c}>{c}</option>
@@ -299,86 +294,86 @@ export const CheckoutModal = ({ onClose }) => {
                   <input
                     type="text"
                     required
-                    placeholder={t('checkout.cityPlaceholder')}
+                    placeholder="e.g. Dar es Salaam / Nairobi"
                     value={formData.city}
                     onChange={(e) => setFormData({ ...formData, city: e.target.value })}
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-brand-leaf/30 text-xs text-brand-charcoal focus:ring-2 focus:ring-brand-forest focus:outline-none bg-brand-surface/40"
+                    className="w-full px-3.5 py-2.5 sm:py-3 rounded-xl border border-brand-leaf/30 text-xs sm:text-sm focus:ring-2 focus:ring-brand-forest focus:outline-none bg-brand-surface/30"
                   />
                 </div>
               </div>
 
+              {/* Delivery Address */}
               <div>
                 <label className="block text-xs font-bold text-brand-charcoal mb-1">
                   {t('checkout.address')} *
                 </label>
-                <input
-                  type="text"
-                  required
-                  placeholder={t('checkout.addressPlaceholder')}
-                  value={formData.address}
-                  onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-brand-leaf/30 text-xs text-brand-charcoal focus:ring-2 focus:ring-brand-forest focus:outline-none bg-brand-surface/40"
-                />
-              </div>
-            </div>
-
-            {/* Payment Method */}
-            <div className="space-y-3 pt-2 border-t border-brand-leaf/20">
-              <h4 className="text-xs font-extrabold uppercase text-brand-forest tracking-wider">
-                {t('checkout.paymentMethod')}
-              </h4>
-
-              <div className="space-y-2">
-                {paymentOptions.map((opt) => (
-                  <label
-                    key={opt.id}
-                    className={`flex items-center space-x-3 p-3 rounded-xl border cursor-pointer text-xs font-bold transition-colors ${
-                      formData.paymentMethod === opt.label
-                        ? 'border-brand-forest bg-brand-surface text-brand-forest'
-                        : 'border-brand-leaf/25 text-brand-charcoal hover:bg-brand-surface/40'
-                    }`}
-                  >
-                    <input
-                      type="radio"
-                      name="paymentMethod"
-                      value={opt.label}
-                      checked={formData.paymentMethod === opt.label}
-                      onChange={() => setFormData({ ...formData, paymentMethod: opt.label })}
-                      className="text-brand-forest focus:ring-brand-forest"
-                    />
-                    <span>{opt.label}</span>
-                  </label>
-                ))}
-              </div>
-            </div>
-
-            {/* Order Total & Submit */}
-            <div className="pt-4 border-t border-brand-leaf/20 flex items-center justify-between">
-              <div>
-                <span className="text-[10px] uppercase font-bold text-brand-muted">
-                  {t('checkout.orderSummary')}
-                </span>
-                <div className="text-xl font-black text-brand-forest font-serif">
-                  {formatPrice(subtotalTZS)}
+                <div className="relative">
+                  <MapPin className="w-4 h-4 absolute left-3 top-3 text-brand-muted" />
+                  <input
+                    type="text"
+                    required
+                    placeholder="e.g. Kinondoni / Westlands / Kololo"
+                    value={formData.address}
+                    onChange={(e) => setFormData({ ...formData, address: e.target.value })}
+                    className="w-full pl-9 pr-3.5 py-2.5 sm:py-3 rounded-xl border border-brand-leaf/30 text-xs sm:text-sm focus:ring-2 focus:ring-brand-forest focus:outline-none bg-brand-surface/30"
+                  />
                 </div>
               </div>
 
+              {/* Payment Method Preference */}
+              <div>
+                <label className="block text-xs font-bold text-brand-charcoal mb-1">
+                  {t('checkout.paymentMethod')}
+                </label>
+                <select
+                  value={formData.paymentMethod}
+                  onChange={(e) => setFormData({ ...formData, paymentMethod: e.target.value })}
+                  className="w-full px-3.5 py-2.5 sm:py-3 rounded-xl border border-brand-leaf/30 text-xs sm:text-sm focus:ring-2 focus:ring-brand-forest focus:outline-none bg-brand-surface/30"
+                >
+                  <option value="Mobile Money (M-Pesa, Tigo Pesa, Airtel Money, MTN)">
+                    Mobile Money (M-Pesa / Tigo Pesa / Airtel Money / MTN)
+                  </option>
+                  <option value="Cash on Delivery">
+                    Cash on Delivery (Available in major cities)
+                  </option>
+                  <option value="Bank Transfer / Card">
+                    Bank Transfer / Visa / MasterCard
+                  </option>
+                </select>
+              </div>
+
+              {/* Order Items Review Mini Box */}
+              <div className="bg-brand-surface p-3.5 rounded-xl border border-brand-leaf/20 text-xs space-y-1.5">
+                <div className="flex justify-between font-bold text-brand-forest">
+                  <span>Selected Products ({items.length}):</span>
+                  <span>{formatPrice(subtotalTZS)}</span>
+                </div>
+                <div className="text-[11px] text-brand-muted">
+                  {items.map(i => `${i.quantity}x ${i.name}`).join(' • ')}
+                </div>
+              </div>
+
+              {/* Submit Button */}
               <button
                 type="submit"
-                disabled={loading || items.length === 0}
-                className={`px-7 py-3.5 rounded-xl font-bold text-xs shadow-md transition-all ${
-                  loading || items.length === 0
+                disabled={loading}
+                className={`w-full py-3.5 sm:py-4 rounded-xl sm:rounded-2xl font-bold text-sm shadow-herbal flex items-center justify-center space-x-2 transition-all ${
+                  loading
                     ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
                     : 'bg-brand-forest hover:bg-brand-leaf text-white hover:shadow-lg'
                 }`}
               >
-                {loading ? t('checkout.processing') : t('checkout.placeOrder')}
+                <span>{loading ? 'Processing Order...' : t('checkout.submitOrder')}</span>
               </button>
-            </div>
-          </form>
+
+              <p className="text-[10px] text-center text-brand-muted">
+                Order will be confirmed with our dispatch team on WhatsApp (+255 752 613 616)
+              </p>
+            </form>
+          </div>
         )}
+
       </div>
     </div>
   );
 };
-

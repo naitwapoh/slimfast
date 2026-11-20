@@ -44,12 +44,12 @@ export const BmsSettings = () => {
   };
 
   return (
-    <div className="space-y-6 max-w-3xl">
+    <div className="space-y-4 sm:space-y-6 max-w-3xl">
       <div>
-        <h2 className="text-2xl font-black font-serif text-brand-forest">
+        <h2 className="text-xl sm:text-2xl font-black font-serif text-brand-forest">
           {t('bms.settings.title')}
         </h2>
-        <p className="text-xs text-brand-charcoal/70 mt-1">
+        <p className="text-xs text-brand-charcoal/70 mt-0.5 sm:mt-1">
           {t('bms.settings.subtitle')}
         </p>
       </div>
@@ -62,20 +62,20 @@ export const BmsSettings = () => {
       )}
 
       {/* Exchange Rates Form */}
-      <form onSubmit={handleSave} className="bg-white p-6 sm:p-8 rounded-3xl border border-brand-leaf/25 shadow-sm space-y-6">
-        <div className="flex items-center justify-between border-b pb-4 border-brand-leaf/20">
+      <form onSubmit={handleSave} className="bg-white p-4 sm:p-8 rounded-3xl border border-brand-leaf/25 shadow-sm space-y-5 sm:space-y-6">
+        <div className="flex items-center justify-between border-b pb-3 sm:pb-4 border-brand-leaf/20">
           <div>
-            <h3 className="text-sm font-bold font-serif text-brand-forest">
+            <h3 className="text-xs sm:text-sm font-bold font-serif text-brand-forest">
               {t('bms.settings.ratesTitle')}
             </h3>
-            <span className="text-[11px] text-brand-muted">
+            <span className="text-[10px] sm:text-[11px] text-brand-muted">
               Base Currency: <strong>Tanzanian Shilling (TZS = 1.0)</strong>
             </span>
           </div>
           <span className="text-xl">🇹🇿</span>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
           {Object.keys(currencies).map((currKey) => {
             const config = currencies[currKey];
             if (currKey === 'TZS') return null; // Base currency
@@ -101,11 +101,11 @@ export const BmsSettings = () => {
           })}
         </div>
 
-        <div className="pt-4 border-t border-brand-leaf/20 flex justify-end">
+        <div className="pt-3 sm:pt-4 border-t border-brand-leaf/20 flex justify-end">
           <button
             type="submit"
             disabled={saving}
-            className="px-6 py-2.5 rounded-xl bg-brand-forest hover:bg-brand-leaf text-white font-bold text-xs shadow-md flex items-center space-x-2 transition-all"
+            className="w-full sm:w-auto px-6 py-2.5 rounded-xl bg-brand-forest hover:bg-brand-leaf text-white font-bold text-xs shadow-md flex items-center justify-center space-x-2 transition-all"
           >
             <Save className="w-4 h-4" />
             <span>{saving ? t('loading') : t('bms.settings.saveRates')}</span>
@@ -115,4 +115,3 @@ export const BmsSettings = () => {
     </div>
   );
 };
-

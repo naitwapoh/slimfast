@@ -95,15 +95,15 @@ export const BmsExpenses = () => {
   const totalExpenses = expenses.reduce((sum, e) => sum + (Number(e.amount) || 0), 0);
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4">
         <div>
-          <h2 className="text-2xl font-black font-serif text-brand-forest">
+          <h2 className="text-xl sm:text-2xl font-black font-serif text-brand-forest">
             {t('bms.expenses.title')}
           </h2>
-          <p className="text-xs text-brand-charcoal/70 mt-1">
+          <p className="text-xs text-brand-charcoal/70 mt-0.5 sm:mt-1">
             {t('bms.expenses.subtitle')}
           </p>
         </div>
@@ -119,10 +119,10 @@ export const BmsExpenses = () => {
       </div>
 
       {/* Expense Summary Card */}
-      <div className="bg-white p-5 rounded-2xl border border-brand-leaf/25 shadow-sm max-w-sm flex items-center justify-between">
+      <div className="bg-white p-4 sm:p-5 rounded-2xl border border-brand-leaf/25 shadow-sm max-w-sm flex items-center justify-between">
         <div>
-          <span className="text-xs uppercase font-bold text-brand-muted">Cumulative Overheads:</span>
-          <div className="text-2xl font-black font-serif text-rose-600 mt-1">
+          <span className="text-[10px] sm:text-xs uppercase font-bold text-brand-muted">Cumulative Overheads:</span>
+          <div className="text-xl sm:text-2xl font-black font-serif text-rose-600 mt-1">
             {formatPrice(totalExpenses)}
           </div>
         </div>
@@ -140,11 +140,11 @@ export const BmsExpenses = () => {
       ) : expenses.length === 0 ? (
         
         /* Clean Empty Expenses State */
-        <div className="bg-white rounded-3xl p-16 text-center border border-dashed border-brand-leaf/30 space-y-3">
-          <div className="w-16 h-16 mx-auto rounded-2xl bg-brand-surface flex items-center justify-center text-brand-muted">
-            <Receipt className="w-8 h-8 text-brand-leaf" />
+        <div className="bg-white rounded-3xl p-10 sm:p-16 text-center border border-dashed border-brand-leaf/30 space-y-3">
+          <div className="w-14 h-14 sm:w-16 sm:h-16 mx-auto rounded-2xl bg-brand-surface flex items-center justify-center text-brand-muted">
+            <Receipt className="w-7 h-7 sm:w-8 sm:h-8 text-brand-leaf" />
           </div>
-          <h3 className="text-lg font-bold font-serif text-brand-forest">
+          <h3 className="text-base sm:text-lg font-bold font-serif text-brand-forest">
             {t('bms.expenses.emptyExpenses')}
           </h3>
           <p className="text-xs text-brand-charcoal/70 max-w-sm mx-auto">
@@ -154,78 +154,123 @@ export const BmsExpenses = () => {
 
       ) : (
 
-        <div className="bg-white rounded-3xl border border-brand-leaf/25 shadow-sm overflow-hidden">
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-xs">
-              <thead className="bg-brand-surface font-bold text-brand-forest border-b border-brand-leaf/20">
-                <tr>
-                  <th className="p-4">{t('bms.expenses.date')}</th>
-                  <th className="p-4">{t('bms.expenses.category')}</th>
-                  <th className="p-4">{t('bms.expenses.notes')}</th>
-                  <th className="p-4">{t('bms.expenses.receiptRef')}</th>
-                  <th className="p-4">{t('bms.expenses.amount')}</th>
-                  <th className="p-4 text-right">{t('actions')}</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-brand-leaf/10">
-                {expenses.map((exp) => (
-                  <tr key={exp.id} className="hover:bg-brand-surface/40 transition-colors">
-                    <td className="p-4 font-mono font-bold text-brand-charcoal">
-                      {exp.date}
-                    </td>
-                    <td className="p-4">
-                      <span className="px-2.5 py-1 rounded-full bg-brand-surface border border-brand-leaf/20 text-brand-forest font-bold text-[11px]">
-                        {exp.category}
-                      </span>
-                    </td>
-                    <td className="p-4 text-brand-charcoal max-w-xs">
-                      {exp.notes || '—'}
-                    </td>
-                    <td className="p-4 font-mono text-brand-muted">
-                      {exp.receiptRef || '—'}
-                    </td>
-                    <td className="p-4 font-black text-rose-600 text-sm">
+        <>
+          {/* MOBILE CARD VIEW FOR SMARTPHONES */}
+          <div className="block md:hidden space-y-3">
+            {expenses.map((exp) => (
+              <div 
+                key={exp.id} 
+                className="bg-white rounded-2xl p-4 border border-brand-leaf/25 shadow-sm space-y-2.5"
+              >
+                <div className="flex items-center justify-between border-b border-brand-leaf/15 pb-2">
+                  <span className="px-2.5 py-0.5 rounded-full bg-brand-surface border border-brand-leaf/20 text-brand-forest font-bold text-[11px]">
+                    {exp.category}
+                  </span>
+                  <span className="font-mono text-xs text-brand-muted">
+                    {exp.date}
+                  </span>
+                </div>
+
+                <div className="flex items-center justify-between text-xs">
+                  <div className="text-brand-charcoal">
+                    {exp.notes && <p className="font-medium">{exp.notes}</p>}
+                    {exp.receiptRef && <p className="text-[10px] text-brand-muted">Ref: {exp.receiptRef}</p>}
+                  </div>
+                  <div className="text-right">
+                    <span className="text-base font-black text-rose-600 block">
                       {formatPrice(exp.amount)}
-                    </td>
-                    <td className="p-4 text-right">
-                      <button
-                        type="button"
-                        onClick={() => handleDeleteExpense(exp.id)}
-                        className="p-1.5 rounded-lg text-brand-muted hover:text-red-600 transition-colors"
-                        title="Delete expense"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+                    </span>
+                  </div>
+                </div>
+
+                <div className="flex justify-end pt-1">
+                  <button
+                    type="button"
+                    onClick={() => handleDeleteExpense(exp.id)}
+                    className="p-1.5 rounded-lg text-brand-muted hover:text-red-600"
+                    title="Delete expense"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </button>
+                </div>
+              </div>
+            ))}
           </div>
-        </div>
+
+          {/* DESKTOP TABLE VIEW */}
+          <div className="hidden md:block bg-white rounded-3xl border border-brand-leaf/25 shadow-sm overflow-hidden">
+            <div className="overflow-x-auto">
+              <table className="w-full text-left text-xs">
+                <thead className="bg-brand-surface font-bold text-brand-forest border-b border-brand-leaf/20">
+                  <tr>
+                    <th className="p-4">{t('bms.expenses.date')}</th>
+                    <th className="p-4">{t('bms.expenses.category')}</th>
+                    <th className="p-4">{t('bms.expenses.notes')}</th>
+                    <th className="p-4">{t('bms.expenses.receiptRef')}</th>
+                    <th className="p-4">{t('bms.expenses.amount')}</th>
+                    <th className="p-4 text-right">{t('actions')}</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-brand-leaf/10">
+                  {expenses.map((exp) => (
+                    <tr key={exp.id} className="hover:bg-brand-surface/40 transition-colors">
+                      <td className="p-4 font-mono font-bold text-brand-charcoal">
+                        {exp.date}
+                      </td>
+                      <td className="p-4">
+                        <span className="px-2.5 py-1 rounded-full bg-brand-surface border border-brand-leaf/20 text-brand-forest font-bold text-[11px]">
+                          {exp.category}
+                        </span>
+                      </td>
+                      <td className="p-4 text-brand-charcoal max-w-xs">
+                        {exp.notes || '—'}
+                      </td>
+                      <td className="p-4 font-mono text-brand-muted">
+                        {exp.receiptRef || '—'}
+                      </td>
+                      <td className="p-4 font-black text-rose-600 text-sm">
+                        {formatPrice(exp.amount)}
+                      </td>
+                      <td className="p-4 text-right">
+                        <button
+                          type="button"
+                          onClick={() => handleDeleteExpense(exp.id)}
+                          className="p-1.5 rounded-lg text-brand-muted hover:text-red-600 transition-colors"
+                          title="Delete expense"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </>
 
       )}
 
-      {/* Log Expense Modal */}
+      {/* Log Expense Modal (Scrollable for mobile keyboards) */}
       {modalOpen && (
-        <div className="fixed inset-0 z-50 overflow-y-auto bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 animate-fadeIn">
+        <div className="fixed inset-0 z-50 overflow-y-auto bg-black/60 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 animate-fadeIn">
           <div 
-            className="bg-white rounded-3xl max-w-md w-full shadow-2xl border border-brand-leaf/30 p-6 space-y-4 relative"
+            className="bg-white rounded-3xl max-w-md w-full max-h-[90vh] overflow-y-auto shadow-2xl border border-brand-leaf/30 p-5 sm:p-6 space-y-4 relative"
             onClick={(e) => e.stopPropagation()}
           >
             <button
               type="button"
               onClick={() => setModalOpen(false)}
-              className="absolute top-5 right-5 p-2 rounded-full hover:bg-brand-surface text-brand-charcoal"
+              className="absolute top-4 right-4 sm:top-5 sm:right-5 p-2 rounded-full hover:bg-brand-surface text-brand-charcoal"
             >
               <X className="w-5 h-5" />
             </button>
 
-            <h3 className="text-xl font-bold font-serif text-brand-forest">
+            <h3 className="text-lg sm:text-xl font-bold font-serif text-brand-forest">
               {t('bms.expenses.logExpense')}
             </h3>
 
-            <form onSubmit={handleAddExpense} className="space-y-4">
+            <form onSubmit={handleAddExpense} className="space-y-3.5">
               <div>
                 <label className="block text-xs font-bold text-brand-charcoal mb-1">
                   {t('bms.expenses.category')} *
@@ -243,15 +288,16 @@ export const BmsExpenses = () => {
 
               <div>
                 <label className="block text-xs font-bold text-brand-charcoal mb-1">
-                  {t('bms.expenses.amount')} *
+                  {t('bms.expenses.amount')} (TZS) *
                 </label>
                 <input
                   type="number"
+                  inputMode="numeric"
                   required
                   placeholder="e.g. 50000"
                   value={formData.amount}
                   onChange={(e) => setFormData({ ...formData, amount: e.target.value })}
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-brand-leaf/30 text-xs font-bold bg-brand-surface/40 text-brand-charcoal"
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-brand-leaf/30 text-xs font-bold bg-brand-surface/40"
                 />
               </div>
 
@@ -264,51 +310,42 @@ export const BmsExpenses = () => {
                   required
                   value={formData.date}
                   onChange={(e) => setFormData({ ...formData, date: e.target.value })}
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-brand-leaf/30 text-xs font-bold bg-brand-surface/40"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-brand-charcoal mb-1">
+                  Notes / Description
+                </label>
+                <input
+                  type="text"
+                  placeholder="e.g. Courier dispatch to Arusha"
+                  value={formData.notes}
+                  onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
                   className="w-full px-3.5 py-2.5 rounded-xl border border-brand-leaf/30 text-xs bg-brand-surface/40"
                 />
               </div>
 
               <div>
                 <label className="block text-xs font-bold text-brand-charcoal mb-1">
-                  {t('bms.expenses.notes')}
-                </label>
-                <textarea
-                  rows="2"
-                  placeholder="e.g. Courier dispatch fee for Arusha and Nairobi parcel delivery"
-                  value={formData.notes}
-                  onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
-                  className="w-full px-3.5 py-2 rounded-xl border border-brand-leaf/30 text-xs bg-brand-surface/40"
-                />
-              </div>
-
-              <div>
-                <label className="block text-xs font-bold text-brand-charcoal mb-1">
-                  {t('bms.expenses.receiptRef')}
+                  Receipt Ref / Invoice #
                 </label>
                 <input
                   type="text"
-                  placeholder="e.g. RCPT-2024-99"
+                  placeholder="e.g. INV-2025-01"
                   value={formData.receiptRef}
                   onChange={(e) => setFormData({ ...formData, receiptRef: e.target.value })}
                   className="w-full px-3.5 py-2.5 rounded-xl border border-brand-leaf/30 text-xs bg-brand-surface/40"
                 />
               </div>
 
-              <div className="pt-2 flex justify-end space-x-2">
-                <button
-                  type="button"
-                  onClick={() => setModalOpen(false)}
-                  className="px-4 py-2 rounded-xl border text-xs font-bold text-brand-charcoal"
-                >
-                  {t('cancel')}
-                </button>
-                <button
-                  type="submit"
-                  className="px-5 py-2 rounded-xl bg-brand-forest hover:bg-brand-leaf text-white text-xs font-bold shadow-md"
-                >
-                  Save Expense
-                </button>
-              </div>
+              <button
+                type="submit"
+                className="w-full py-3.5 rounded-xl bg-brand-forest hover:bg-brand-leaf text-white font-bold text-xs shadow-md transition-all"
+              >
+                Save Expense
+              </button>
             </form>
           </div>
         </div>
@@ -317,4 +354,3 @@ export const BmsExpenses = () => {
     </div>
   );
 };
-

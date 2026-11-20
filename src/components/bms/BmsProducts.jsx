@@ -221,7 +221,7 @@ export const BmsProducts = ({ isReadOnly = false }) => {
         ingredients: formData.ingredients,
         directions: formData.directions,
         benefits: formData.benefits,
-        imageUrl: finalImageUrl || '/leaf.svg',
+        imageUrl: finalImageUrl || '/logo.jpg',
         updatedAt: new Date().toISOString()
       };
 
@@ -259,63 +259,62 @@ export const BmsProducts = ({ isReadOnly = false }) => {
     e.preventDefault();
     if (!restockModalProduct || !db) return;
     try {
-      await updateDoc(doc(db, 'products', restockModalProduct.id), {
+      const prodRef = doc(db, 'products', restockModalProduct.id);
+      await updateDoc(prodRef, {
         stock: increment(Number(restockData.unitsToAdd)),
-        batchNumber: restockData.newBatchNumber || restockModalProduct.batchNumber,
-        expiryDate: restockData.newExpiry || restockModalProduct.expiryDate,
+        batchNumber: restockData.newBatchNumber || restockModalProduct.batchNumber || 'RESTOCK',
+        expiryDate: restockData.newExpiry || restockModalProduct.expiryDate || 'FEB 2027',
         lastRestockedAt: new Date().toISOString()
       });
 
-      // Audit log
       await addDoc(collection(db, 'audit_logs'), {
-        action: `Restocked ${restockData.unitsToAdd} units of ${restockModalProduct.name} (Batch: ${restockData.newBatchNumber || 'Same'})`,
+        action: `Restocked ${restockData.unitsToAdd} units of ${restockModalProduct.name}`,
         performedBy: userProfile?.name || currentUser?.email || 'Owner',
         timestamp: new Date().toISOString()
       });
 
       setRestockModalProduct(null);
     } catch (err) {
-      alert('Restock failed: ' + err.message);
+      alert('Error restocking: ' + err.message);
     }
   };
 
-  // Quick Seed Handler for the Owner
   const handleSeedCatalog = async () => {
     if (!isOwner || !db) return;
-    if (!window.confirm('Initialize official SLIMFAST products (Slimming Tea & Bean Powder) into Firestore?')) return;
+    if (!window.confirm('This will seed the official SLIMFAST catalog (Slimming Tea, Bean Powder & Duo Combo) into Firestore. Proceed?')) return;
     try {
-      for (const item of OFFICIAL_SLIMFAST_CATALOG) {
+      for (const prod of OFFICIAL_SLIMFAST_CATALOG) {
         await addDoc(collection(db, 'products'), {
-          ...item,
+          ...prod,
           createdAt: new Date().toISOString()
         });
       }
-      alert('Official SLIMFAST products loaded into Firestore!');
+      alert('Official SLIMFAST products seeded successfully!');
     } catch (err) {
-      alert('Could not seed catalog: ' + err.message);
+      alert('Could not seed products: ' + err.message);
     }
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       
       {/* Title & Action Buttons */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4">
         <div>
-          <h2 className="text-2xl font-black font-serif text-brand-forest">
+          <h2 className="text-xl sm:text-2xl font-black font-serif text-brand-forest">
             {t('bms.inventory.title')}
           </h2>
-          <p className="text-xs text-brand-charcoal/70 mt-1">
+          <p className="text-xs text-brand-charcoal/70 mt-0.5 sm:mt-1">
             {t('bms.inventory.subtitle')}
           </p>
         </div>
 
         {isOwner && (
-          <div className="flex items-center space-x-2">
+          <div className="flex flex-wrap items-center gap-2">
             <button
               type="button"
               onClick={handleSeedCatalog}
-              className="px-3.5 py-2.5 rounded-xl border border-brand-leaf/40 bg-brand-surface hover:bg-brand-leaf/20 text-brand-forest font-bold text-xs flex items-center space-x-1.5 transition-colors"
+              className="px-3 sm:px-3.5 py-2 sm:py-2.5 rounded-xl border border-brand-leaf/40 bg-brand-surface hover:bg-brand-leaf/20 text-brand-forest font-bold text-xs flex items-center space-x-1.5 transition-colors"
               title="Add official SLIMFAST products"
             >
               <Sparkles className="w-3.5 h-3.5 text-brand-leaf" />
@@ -325,7 +324,7 @@ export const BmsProducts = ({ isReadOnly = false }) => {
             <button
               type="button"
               onClick={openAddModal}
-              className="px-4 py-2.5 rounded-xl bg-brand-forest hover:bg-brand-leaf text-white font-bold text-xs shadow-md flex items-center space-x-1.5 transition-all"
+              className="px-3.5 sm:px-4 py-2 sm:py-2.5 rounded-xl bg-brand-forest hover:bg-brand-leaf text-white font-bold text-xs shadow-md flex items-center space-x-1.5 transition-all"
             >
               <Plus className="w-4 h-4" />
               <span>{t('bms.inventory.addProduct')}</span>
@@ -334,7 +333,7 @@ export const BmsProducts = ({ isReadOnly = false }) => {
         )}
       </div>
 
-      {/* Product List / Table */}
+      {/* Product List / Grid */}
       {loading ? (
         <div className="text-center py-16">
           <div className="w-10 h-10 border-4 border-brand-leaf/30 border-t-brand-forest rounded-full animate-spin mx-auto" />
@@ -343,11 +342,11 @@ export const BmsProducts = ({ isReadOnly = false }) => {
       ) : products.length === 0 ? (
         
         /* Clean Empty Catalog State */
-        <div className="bg-white rounded-3xl p-16 text-center border border-dashed border-brand-leaf/30 space-y-4">
-          <div className="w-16 h-16 mx-auto rounded-2xl bg-brand-surface flex items-center justify-center text-brand-muted">
-            <Package className="w-8 h-8 text-brand-leaf" />
+        <div className="bg-white rounded-3xl p-10 sm:p-16 text-center border border-dashed border-brand-leaf/30 space-y-4">
+          <div className="w-14 h-14 sm:w-16 sm:h-16 mx-auto rounded-2xl bg-brand-surface flex items-center justify-center text-brand-muted">
+            <Package className="w-7 h-7 sm:w-8 sm:h-8 text-brand-leaf" />
           </div>
-          <h3 className="text-lg font-bold font-serif text-brand-forest">
+          <h3 className="text-base sm:text-lg font-bold font-serif text-brand-forest">
             {t('products.emptyTitle')}
           </h3>
           <p className="text-xs text-brand-charcoal/70 max-w-md mx-auto leading-relaxed">
@@ -369,21 +368,21 @@ export const BmsProducts = ({ isReadOnly = false }) => {
 
       ) : (
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
           {products.map((p) => {
             const isOutOfStock = (p.stock ?? 0) <= 0;
             const isLowStock = !isOutOfStock && (p.stock ?? 0) <= (p.lowStockThreshold || 10);
             return (
               <div 
                 key={p.id} 
-                className="bg-white rounded-3xl p-5 border border-brand-leaf/25 shadow-sm space-y-4 flex flex-col justify-between"
+                className="bg-white rounded-3xl p-4 sm:p-5 border border-brand-leaf/25 shadow-sm space-y-3 sm:space-y-4 flex flex-col justify-between"
               >
                 <div className="space-y-3">
                   <div className="flex items-center justify-between">
                     <span className="text-[10px] font-bold uppercase tracking-wider text-brand-leaf bg-brand-surface px-2.5 py-0.5 rounded-full border border-brand-leaf/20">
                       {p.category || 'Herbal'}
                     </span>
-                    <span className={`text-xs font-bold px-2 py-0.5 rounded-md ${
+                    <span className={`text-[11px] sm:text-xs font-bold px-2 py-0.5 rounded-md ${
                       isOutOfStock ? 'bg-red-100 text-red-700' : isLowStock ? 'bg-amber-100 text-amber-800' : 'bg-emerald-50 text-emerald-700'
                     }`}>
                       Stock: {p.stock ?? 0}
@@ -391,39 +390,39 @@ export const BmsProducts = ({ isReadOnly = false }) => {
                   </div>
 
                   <div className="flex items-center space-x-3">
-                    <div className="w-16 h-16 shrink-0 bg-brand-surface rounded-xl p-1.5 flex items-center justify-center border border-brand-leaf/20">
+                    <div className="w-14 h-14 sm:w-16 sm:h-16 shrink-0 bg-brand-surface rounded-xl p-1.5 flex items-center justify-center border border-brand-leaf/20">
                       <img 
-                        src={p.imageUrl || '/leaf.svg'} 
+                        src={p.imageUrl || '/logo.jpg'} 
                         alt={p.name} 
                         className="max-h-full max-w-full object-contain"
                         onError={(e) => {
                           e.target.onerror = null;
-                          e.target.src = '/leaf.svg';
+                          e.target.src = '/logo.jpg';
                         }}
                       />
                     </div>
-                    <div>
-                      <h4 className="text-sm font-bold font-serif text-brand-forest line-clamp-1">
+                    <div className="min-w-0">
+                      <h4 className="text-xs sm:text-sm font-bold font-serif text-brand-forest line-clamp-1">
                         {p.name}
                       </h4>
                       <p className="text-xs font-black text-brand-leaf mt-0.5">
                         {formatPrice(p.priceTZS || p.price)}
                       </p>
-                      <p className="text-[10px] text-brand-muted mt-0.5">
+                      <p className="text-[10px] text-brand-muted mt-0.5 truncate">
                         Batch: {p.batchNumber || 'N/A'} • Exp: {p.expiryDate || 'N/A'}
                       </p>
                     </div>
                   </div>
 
                   {p.ingredients && (
-                    <div className="text-[11px] text-brand-charcoal/80 bg-brand-surface/50 p-2.5 rounded-xl border border-brand-leaf/15 line-clamp-2">
+                    <div className="text-[10px] sm:text-[11px] text-brand-charcoal/80 bg-brand-surface/50 p-2 sm:p-2.5 rounded-xl border border-brand-leaf/15 line-clamp-2">
                       <strong>Botanicals:</strong> {p.ingredients}
                     </div>
                   )}
                 </div>
 
                 {/* Card Action Buttons */}
-                <div className="pt-3 border-t border-brand-leaf/15 flex items-center justify-between gap-2">
+                <div className="pt-2 sm:pt-3 border-t border-brand-leaf/15 flex items-center justify-between gap-2">
                   <button
                     type="button"
                     onClick={() => {
@@ -434,13 +433,13 @@ export const BmsProducts = ({ isReadOnly = false }) => {
                         newExpiry: p.expiryDate || 'FEB 2027'
                       });
                     }}
-                    className="px-3 py-1.5 rounded-lg bg-brand-surface hover:bg-brand-leaf/20 text-brand-forest font-bold text-xs border border-brand-leaf/30 transition-colors"
+                    className="px-2.5 sm:px-3 py-1.5 rounded-lg bg-brand-surface hover:bg-brand-leaf/20 text-brand-forest font-bold text-[11px] sm:text-xs border border-brand-leaf/30 transition-colors"
                   >
                     {t('bms.inventory.restockBatch')}
                   </button>
 
                   {isOwner && (
-                    <div className="flex items-center space-x-1.5">
+                    <div className="flex items-center space-x-1 sm:space-x-1.5">
                       <button
                         type="button"
                         onClick={() => openEditModal(p)}
@@ -466,26 +465,26 @@ export const BmsProducts = ({ isReadOnly = false }) => {
         </div>
       )}
 
-      {/* Add / Edit Product Modal */}
+      {/* Add / Edit Product Modal (Scrollable on mobile) */}
       {modalOpen && (
-        <div className="fixed inset-0 z-50 overflow-y-auto bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 animate-fadeIn">
+        <div className="fixed inset-0 z-50 overflow-y-auto bg-black/60 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 animate-fadeIn">
           <div 
-            className="bg-white rounded-3xl max-w-xl w-full max-h-[92vh] overflow-y-auto shadow-2xl border border-brand-leaf/30 p-6 sm:p-8 space-y-5 relative"
+            className="bg-white rounded-3xl max-w-xl w-full max-h-[92vh] overflow-y-auto shadow-2xl border border-brand-leaf/30 p-5 sm:p-8 space-y-4 sm:space-y-5 relative"
             onClick={(e) => e.stopPropagation()}
           >
             <button
               type="button"
               onClick={() => setModalOpen(false)}
-              className="absolute top-5 right-5 p-2 rounded-full hover:bg-brand-surface text-brand-charcoal"
+              className="absolute top-4 right-4 sm:top-5 sm:right-5 p-2 rounded-full hover:bg-brand-surface text-brand-charcoal"
             >
               <X className="w-5 h-5" />
             </button>
 
-            <h3 className="text-xl font-bold font-serif text-brand-forest">
+            <h3 className="text-lg sm:text-xl font-bold font-serif text-brand-forest">
               {editingProduct ? t('bms.inventory.editProduct') : t('bms.inventory.addProduct')}
             </h3>
 
-            <form onSubmit={handleSaveProduct} className="space-y-4">
+            <form onSubmit={handleSaveProduct} className="space-y-3.5 sm:space-y-4">
               <div>
                 <label className="block text-xs font-bold text-brand-charcoal mb-1">
                   {t('bms.inventory.productName')} *
@@ -500,7 +499,7 @@ export const BmsProducts = ({ isReadOnly = false }) => {
                 />
               </div>
 
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
                   <label className="block text-xs font-bold text-brand-charcoal mb-1">
                     {t('bms.inventory.category')}
@@ -519,8 +518,9 @@ export const BmsProducts = ({ isReadOnly = false }) => {
                   </label>
                   <input
                     type="number"
+                    inputMode="numeric"
                     required
-                    placeholder="e.g. 45000"
+                    placeholder="e.g. 25000"
                     value={formData.priceTZS}
                     onChange={(e) => setFormData({ ...formData, priceTZS: e.target.value })}
                     className="w-full px-3.5 py-2.5 rounded-xl border border-brand-leaf/30 text-xs focus:ring-2 focus:ring-brand-forest bg-brand-surface/40 font-bold"
@@ -528,13 +528,14 @@ export const BmsProducts = ({ isReadOnly = false }) => {
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
                   <label className="block text-xs font-bold text-brand-charcoal mb-1">
                     {t('bms.inventory.currentStock')} *
                   </label>
                   <input
                     type="number"
+                    inputMode="numeric"
                     required
                     value={formData.stock}
                     onChange={(e) => setFormData({ ...formData, stock: e.target.value })}
@@ -547,6 +548,7 @@ export const BmsProducts = ({ isReadOnly = false }) => {
                   </label>
                   <input
                     type="number"
+                    inputMode="numeric"
                     value={formData.lowStockThreshold}
                     onChange={(e) => setFormData({ ...formData, lowStockThreshold: e.target.value })}
                     className="w-full px-3.5 py-2.5 rounded-xl border border-brand-leaf/30 text-xs focus:ring-2 focus:ring-brand-forest bg-brand-surface/40"
@@ -554,7 +556,7 @@ export const BmsProducts = ({ isReadOnly = false }) => {
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
                   <label className="block text-xs font-bold text-brand-charcoal mb-1">
                     {t('bms.inventory.batchNumber')}
@@ -611,14 +613,14 @@ export const BmsProducts = ({ isReadOnly = false }) => {
                 <label className="block text-xs font-bold text-brand-forest">
                   {t('bms.inventory.imageSource')}
                 </label>
-                <div className="flex flex-col sm:flex-row items-center gap-3">
+                <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-3">
                   <input
                     type="file"
                     accept="image/*"
                     onChange={(e) => setImageFile(e.target.files[0])}
                     className="text-xs text-brand-charcoal file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-brand-forest file:text-white hover:file:bg-brand-leaf"
                   />
-                  <span className="text-[10px] text-brand-muted">or URL below</span>
+                  <span className="text-[10px] text-brand-muted">or direct URL</span>
                 </div>
                 <input
                   type="url"
@@ -657,30 +659,31 @@ export const BmsProducts = ({ isReadOnly = false }) => {
 
       {/* Restock Batch Modal */}
       {restockModalProduct && (
-        <div className="fixed inset-0 z-50 overflow-y-auto bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 animate-fadeIn">
+        <div className="fixed inset-0 z-50 overflow-y-auto bg-black/60 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 animate-fadeIn">
           <div 
-            className="bg-white rounded-3xl max-w-md w-full shadow-2xl border border-brand-leaf/30 p-6 space-y-4 relative"
+            className="bg-white rounded-3xl max-w-md w-full max-h-[90vh] overflow-y-auto shadow-2xl border border-brand-leaf/30 p-5 sm:p-6 space-y-4 relative"
             onClick={(e) => e.stopPropagation()}
           >
             <button
               type="button"
               onClick={() => setRestockModalProduct(null)}
-              className="absolute top-5 right-5 p-2 rounded-full hover:bg-brand-surface text-brand-charcoal"
+              className="absolute top-4 right-4 sm:top-5 sm:right-5 p-2 rounded-full hover:bg-brand-surface text-brand-charcoal"
             >
               <X className="w-5 h-5" />
             </button>
 
-            <h3 className="text-lg font-bold font-serif text-brand-forest">
+            <h3 className="text-base sm:text-lg font-bold font-serif text-brand-forest">
               {t('bms.inventory.restockTitle')}: {restockModalProduct.name}
             </h3>
 
-            <form onSubmit={handleRestockBatch} className="space-y-4">
+            <form onSubmit={handleRestockBatch} className="space-y-3.5">
               <div>
                 <label className="block text-xs font-bold text-brand-charcoal mb-1">
                   {t('bms.inventory.unitsToAdd')} *
                 </label>
                 <input
                   type="number"
+                  inputMode="numeric"
                   min="1"
                   required
                   value={restockData.unitsToAdd}
@@ -738,4 +741,3 @@ export const BmsProducts = ({ isReadOnly = false }) => {
     </div>
   );
 };
-

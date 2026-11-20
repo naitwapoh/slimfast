@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ShoppingCart, CheckCircle, AlertCircle, Printer, User, DollarSign } from 'lucide-react';
+import { ShoppingCart, CheckCircle, AlertCircle, Printer, User, DollarSign, Plus, Minus } from 'lucide-react';
 import { collection, onSnapshot, addDoc, doc, updateDoc, increment } from 'firebase/firestore';
 import { db } from '../../firebase';
 import { useAuth } from '../../context/AuthContext';
@@ -119,22 +119,22 @@ export const BmsPOS = () => {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       
       {/* Title */}
       <div>
-        <h2 className="text-2xl font-black font-serif text-brand-forest">
+        <h2 className="text-xl sm:text-2xl font-black font-serif text-brand-forest">
           {t('bms.pos.title')}
         </h2>
-        <p className="text-xs text-brand-charcoal/70 mt-1">
+        <p className="text-xs text-brand-charcoal/70 mt-0.5 sm:mt-1">
           {t('bms.pos.subtitle')}
         </p>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 sm:gap-6 items-start">
         
         {/* Entry Form */}
-        <div className="lg:col-span-7 bg-white p-6 sm:p-8 rounded-3xl border border-brand-leaf/25 shadow-sm space-y-5">
+        <div className="lg:col-span-7 bg-white p-4 sm:p-7 rounded-3xl border border-brand-leaf/25 shadow-sm space-y-4 sm:space-y-5">
           {successMessage && (
             <div className="p-3.5 bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs rounded-xl flex items-center space-x-2">
               <CheckCircle className="w-4 h-4 shrink-0 text-emerald-600" />
@@ -149,7 +149,7 @@ export const BmsPOS = () => {
             </div>
           )}
 
-          <form onSubmit={handleCompleteSale} className="space-y-4">
+          <form onSubmit={handleCompleteSale} className="space-y-3.5 sm:space-y-4">
             
             {/* Product Selector */}
             <div>
@@ -160,7 +160,7 @@ export const BmsPOS = () => {
                 required
                 value={selectedProductId}
                 onChange={(e) => setSelectedProductId(e.target.value)}
-                className="w-full px-3.5 py-2.5 rounded-xl border border-brand-leaf/30 text-xs text-brand-charcoal focus:ring-2 focus:ring-brand-forest focus:outline-none bg-brand-surface/40"
+                className="w-full px-3.5 py-3 rounded-xl border border-brand-leaf/30 text-xs text-brand-charcoal focus:ring-2 focus:ring-brand-forest focus:outline-none bg-brand-surface/40"
               >
                 <option value="">{t('bms.pos.chooseProduct')}</option>
                 {products.map(p => (
@@ -171,12 +171,19 @@ export const BmsPOS = () => {
               </select>
             </div>
 
-            {/* Quantity & Stock Check */}
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="block text-xs font-bold text-brand-charcoal mb-1">
-                  {t('bms.pos.quantity')} *
-                </label>
+            {/* Quantity Selector with Touch Controls */}
+            <div>
+              <label className="block text-xs font-bold text-brand-charcoal mb-1">
+                {t('bms.pos.quantity')} *
+              </label>
+              <div className="flex items-center space-x-2">
+                <button
+                  type="button"
+                  onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                  className="w-10 h-10 rounded-xl bg-brand-surface border border-brand-leaf/30 flex items-center justify-center text-brand-charcoal hover:bg-brand-leaf/20"
+                >
+                  <Minus className="w-4 h-4" />
+                </button>
                 <input
                   type="number"
                   min="1"
@@ -184,16 +191,32 @@ export const BmsPOS = () => {
                   required
                   value={quantity}
                   onChange={(e) => setQuantity(Number(e.target.value))}
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-brand-leaf/30 text-xs text-brand-charcoal focus:ring-2 focus:ring-brand-forest focus:outline-none bg-brand-surface/40 font-bold"
+                  className="w-20 text-center py-2.5 rounded-xl border border-brand-leaf/30 text-sm font-black text-brand-forest focus:ring-2 focus:ring-brand-forest focus:outline-none bg-brand-surface/40"
                 />
-              </div>
+                <button
+                  type="button"
+                  onClick={() => setQuantity(quantity + 1)}
+                  className="w-10 h-10 rounded-xl bg-brand-surface border border-brand-leaf/30 flex items-center justify-center text-brand-charcoal hover:bg-brand-leaf/20"
+                >
+                  <Plus className="w-4 h-4" />
+                </button>
 
-              <div>
-                <label className="block text-xs font-bold text-brand-charcoal mb-1">
-                  Current Stock Available
-                </label>
-                <div className="px-3.5 py-2.5 rounded-xl border border-brand-leaf/20 bg-brand-surface text-xs font-bold text-brand-forest">
-                  {selectedProduct ? `${selectedProduct.stock ?? 0} units` : 'Select product'}
+                {/* Quick Presets for Speed */}
+                <div className="flex items-center space-x-1 pl-2">
+                  {[1, 2, 5].map((preset) => (
+                    <button
+                      key={preset}
+                      type="button"
+                      onClick={() => setQuantity(preset)}
+                      className={`px-2.5 py-2 rounded-lg text-xs font-bold border transition-colors ${
+                        quantity === preset
+                          ? 'bg-brand-forest text-white border-brand-forest'
+                          : 'bg-white text-brand-muted border-brand-leaf/20 hover:bg-brand-surface'
+                      }`}
+                    >
+                      {preset}x
+                    </button>
+                  ))}
                 </div>
               </div>
             </div>
@@ -207,18 +230,18 @@ export const BmsPOS = () => {
                 <button
                   type="button"
                   onClick={() => setChannel('walk-in')}
-                  className={`py-2 px-3 rounded-xl text-xs font-bold border transition-colors ${
+                  className={`py-2.5 px-3 rounded-xl text-xs font-bold border transition-colors ${
                     channel === 'walk-in'
                       ? 'bg-brand-forest text-white border-brand-forest shadow-sm'
                       : 'bg-brand-surface/40 text-brand-charcoal border-brand-leaf/30 hover:bg-brand-surface'
                   }`}
                 >
-                  Walk-in Customer
+                  Walk-in Counter
                 </button>
                 <button
                   type="button"
                   onClick={() => setChannel('online')}
-                  className={`py-2 px-3 rounded-xl text-xs font-bold border transition-colors ${
+                  className={`py-2.5 px-3 rounded-xl text-xs font-bold border transition-colors ${
                     channel === 'online'
                       ? 'bg-brand-forest text-white border-brand-forest shadow-sm'
                       : 'bg-brand-surface/40 text-brand-charcoal border-brand-leaf/30 hover:bg-brand-surface'
@@ -235,13 +258,13 @@ export const BmsPOS = () => {
                 Customer Name (Optional)
               </label>
               <div className="relative">
-                <User className="w-4 h-4 absolute left-3 top-3 text-brand-muted" />
+                <User className="w-4 h-4 absolute left-3 top-3.5 text-brand-muted" />
                 <input
                   type="text"
-                  placeholder="e.g. Amina Juma / Customer Name"
+                  placeholder="e.g. Walk-in Counter Customer"
                   value={customerName}
                   onChange={(e) => setCustomerName(e.target.value)}
-                  className="w-full pl-9 pr-3 py-2.5 rounded-xl border border-brand-leaf/30 text-xs text-brand-charcoal focus:ring-2 focus:ring-brand-forest focus:outline-none bg-brand-surface/40"
+                  className="w-full pl-9 pr-3 py-2.5 sm:py-3 rounded-xl border border-brand-leaf/30 text-xs text-brand-charcoal focus:ring-2 focus:ring-brand-forest focus:outline-none bg-brand-surface/40"
                 />
               </div>
             </div>
@@ -254,113 +277,90 @@ export const BmsPOS = () => {
               <select
                 value={paymentMethod}
                 onChange={(e) => setPaymentMethod(e.target.value)}
-                className="w-full px-3.5 py-2.5 rounded-xl border border-brand-leaf/30 text-xs text-brand-charcoal focus:ring-2 focus:ring-brand-forest focus:outline-none bg-brand-surface/40 font-semibold"
+                className="w-full px-3.5 py-3 rounded-xl border border-brand-leaf/30 text-xs text-brand-charcoal focus:ring-2 focus:ring-brand-forest focus:outline-none bg-brand-surface/40 font-semibold"
               >
                 <option value="Cash">Cash (Counter)</option>
                 <option value="M-Pesa">M-Pesa</option>
                 <option value="Tigo Pesa">Tigo Pesa</option>
                 <option value="Airtel Money">Airtel Money</option>
-                <option value="Bank Card">Bank Card / POS Machine</option>
+                <option value="Bank Card">Bank Card</option>
               </select>
             </div>
 
-            {/* Sale Total Preview & Submit */}
-            <div className="pt-4 border-t border-brand-leaf/20 flex items-center justify-between">
-              <div>
-                <span className="text-[10px] uppercase font-bold text-brand-muted">Total Due:</span>
-                <div className="text-xl font-black text-brand-forest font-serif">
-                  {formatPrice(
-                    selectedProduct ? (selectedProduct.priceTZS || selectedProduct.price) * quantity : 0
-                  )}
+            {/* Price Preview */}
+            {selectedProduct && (
+              <div className="p-3.5 bg-brand-surface rounded-2xl border border-brand-leaf/25 flex items-center justify-between">
+                <div>
+                  <span className="text-[10px] text-brand-muted uppercase font-bold block">Total Payable:</span>
+                  <span className="text-lg font-black text-brand-forest">
+                    {formatPrice((Number(selectedProduct.priceTZS || selectedProduct.price) || 0) * quantity)}
+                  </span>
                 </div>
+                <span className="text-xs font-bold text-brand-leaf">
+                  Stock after sale: {(selectedProduct.stock ?? 0) - quantity}
+                </span>
               </div>
+            )}
 
-              <button
-                type="submit"
-                disabled={loading || !selectedProduct || (selectedProduct.stock ?? 0) < quantity}
-                className={`px-6 py-3.5 rounded-xl font-bold text-xs shadow-md transition-all ${
-                  loading || !selectedProduct || (selectedProduct.stock ?? 0) < quantity
-                    ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                    : 'bg-brand-forest hover:bg-brand-leaf text-white hover:shadow-lg'
-                }`}
-              >
-                {loading ? t('loading') : t('bms.pos.recordSale')}
-              </button>
-            </div>
+            {/* Submit Button */}
+            <button
+              type="submit"
+              disabled={loading || !selectedProduct}
+              className={`w-full py-3.5 sm:py-4 rounded-xl sm:rounded-2xl font-bold text-xs sm:text-sm shadow-md transition-all ${
+                loading || !selectedProduct
+                  ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                  : 'bg-brand-forest hover:bg-brand-leaf text-white hover:shadow-lg'
+              }`}
+            >
+              {loading ? 'Recording Sale...' : t('bms.pos.submitSale')}
+            </button>
           </form>
         </div>
 
-        {/* Counter Receipt Preview Panel */}
-        <div className="lg:col-span-5 bg-white p-6 rounded-3xl border border-brand-leaf/25 shadow-sm space-y-4">
-          <div className="flex items-center justify-between border-b pb-3 border-brand-leaf/20">
-            <h3 className="text-xs font-extrabold uppercase text-brand-forest tracking-wider">
-              {t('bms.pos.receipt')}
+        {/* Counter Receipt Preview */}
+        <div className="lg:col-span-5 bg-white p-4 sm:p-7 rounded-3xl border border-brand-leaf/25 shadow-sm space-y-4">
+          <div className="flex items-center space-x-2 border-b border-brand-leaf/20 pb-3">
+            <Printer className="w-4 h-4 text-brand-forest" />
+            <h3 className="text-sm font-bold font-serif text-brand-forest">
+              Latest Sale Receipt
             </h3>
-            {lastSaleReceipt && (
-              <button
-                type="button"
-                onClick={() => setLastSaleReceipt(lastSaleReceipt)}
-                className="text-xs text-brand-forest hover:text-brand-leaf flex items-center space-x-1 font-bold"
-              >
-                <Printer className="w-3.5 h-3.5" />
-                <span>Print Slip</span>
-              </button>
-            )}
           </div>
 
           {lastSaleReceipt ? (
-            <div className="bg-brand-surface/60 rounded-2xl p-4 text-xs space-y-2 border border-brand-leaf/20 font-mono">
-              <div className="text-center font-bold font-serif text-brand-forest text-sm pb-2 border-b border-brand-leaf/20">
-                SLIMFAST COUNTER RECEIPT
+            <div className="p-4 bg-brand-surface rounded-2xl border border-brand-leaf/30 space-y-3 text-xs">
+              <div className="flex justify-between border-b border-brand-leaf/20 pb-2">
+                <span className="font-bold text-brand-muted">Receipt #:</span>
+                <span className="font-mono font-bold text-brand-forest">#{lastSaleReceipt.orderId}</span>
               </div>
               <div className="flex justify-between">
-                <span>Receipt:</span>
-                <span className="font-bold">#{lastSaleReceipt.orderId}</span>
+                <span className="text-brand-muted">Customer:</span>
+                <span className="font-bold text-brand-charcoal">{lastSaleReceipt.customerName}</span>
               </div>
               <div className="flex justify-between">
-                <span>Staff:</span>
-                <span>{lastSaleReceipt.recordedByStaffName}</span>
+                <span className="text-brand-muted">Channel:</span>
+                <span className="font-bold uppercase text-[10px] text-brand-leaf">{lastSaleReceipt.channel}</span>
               </div>
               <div className="flex justify-between">
-                <span>Customer:</span>
-                <span>{lastSaleReceipt.customerName}</span>
+                <span className="text-brand-muted">Items:</span>
+                <span className="font-bold text-brand-charcoal">{lastSaleReceipt.items[0]?.quantity}x {lastSaleReceipt.items[0]?.name}</span>
               </div>
               <div className="flex justify-between">
-                <span>Payment:</span>
-                <span>{lastSaleReceipt.paymentMethod}</span>
+                <span className="text-brand-muted">Payment:</span>
+                <span className="font-bold text-brand-charcoal">{lastSaleReceipt.paymentMethod}</span>
               </div>
-              <div className="pt-2 border-t border-brand-leaf/20">
-                {(lastSaleReceipt.items || []).map((it, idx) => (
-                  <div key={idx} className="flex justify-between font-bold">
-                    <span>{it.quantity}x {it.name}</span>
-                    <span>{formatPrice(it.priceTZS * it.quantity)}</span>
-                  </div>
-                ))}
-              </div>
-              <div className="pt-2 border-t border-brand-leaf/20 flex justify-between font-extrabold text-brand-forest text-sm">
-                <span>TOTAL:</span>
-                <span>{formatPrice(lastSaleReceipt.totalTZS)}</span>
+              <div className="flex justify-between pt-2 border-t border-brand-leaf/20 text-sm font-bold">
+                <span className="text-brand-forest">Amount Paid:</span>
+                <span className="text-brand-leaf font-black">{formatPrice(lastSaleReceipt.totalTZS)}</span>
               </div>
             </div>
           ) : (
-            <div className="text-center py-12 text-brand-muted text-xs space-y-2">
-              <ShoppingCart className="w-8 h-8 mx-auto text-brand-leaf" />
-              <p>Completed walk-in receipts will appear here for instant printing or customer verification.</p>
+            <div className="text-center py-10 text-xs text-brand-muted">
+              Select product and complete sale to print or view counter receipt.
             </div>
           )}
         </div>
 
       </div>
-
-      {/* Printable modal if staff clicks print */}
-      {lastSaleReceipt && (
-        <PackingSlipModal
-          order={lastSaleReceipt}
-          onClose={() => setLastSaleReceipt(null)}
-        />
-      )}
-
     </div>
   );
 };
-

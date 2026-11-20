@@ -10,7 +10,7 @@ import {
   Calendar,
   Sparkles
 } from 'lucide-react';
-import { collection, onSnapshot, query, orderBy } from 'firebase/firestore';
+import { collection, onSnapshot } from 'firebase/firestore';
 import { db } from '../../firebase';
 import { useLanguage } from '../../context/LanguageContext';
 import { useCurrency } from '../../context/CurrencyContext';
@@ -82,88 +82,88 @@ export const BmsDashboard = ({ onNavigate }) => {
   const posOrders = orders.filter(o => o.channel === 'pos');
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       
       {/* Title */}
       <div>
-        <h2 className="text-2xl font-black font-serif text-brand-forest">
+        <h2 className="text-xl sm:text-2xl font-black font-serif text-brand-forest">
           {t('bms.dashboard.title')}
         </h2>
-        <p className="text-xs text-brand-charcoal/70 mt-1">
+        <p className="text-xs text-brand-charcoal/70 mt-0.5 sm:mt-1">
           {t('bms.dashboard.subtitle')}
         </p>
       </div>
 
-      {/* KPI Cards Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      {/* KPI Cards Grid (Responsive 1-col on mobile, 2-col on sm, 4-col on lg) */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
         
         {/* Gross Revenue */}
-        <div className="bg-white p-5 rounded-2xl border border-brand-leaf/25 shadow-sm space-y-3">
+        <div className="bg-white p-4 sm:p-5 rounded-2xl border border-brand-leaf/25 shadow-sm space-y-2.5 sm:space-y-3">
           <div className="flex items-center justify-between text-brand-muted">
-            <span className="text-xs font-bold uppercase tracking-wider">{t('bms.dashboard.totalRevenue')}</span>
+            <span className="text-[11px] sm:text-xs font-bold uppercase tracking-wider">{t('bms.dashboard.totalRevenue')}</span>
             <div className="w-8 h-8 rounded-lg bg-brand-surface text-brand-forest flex items-center justify-center">
               <DollarSign className="w-4 h-4" />
             </div>
           </div>
           <div>
-            <div className="text-2xl font-black font-serif text-brand-forest">
+            <div className="text-xl sm:text-2xl font-black font-serif text-brand-forest">
               {formatPrice(totalGrossRevenue)}
             </div>
-            <div className="text-[11px] text-brand-muted mt-1">
+            <div className="text-[10px] sm:text-[11px] text-brand-muted mt-0.5">
               From {orders.length} verified order(s)
             </div>
           </div>
         </div>
 
         {/* Total Orders */}
-        <div className="bg-white p-5 rounded-2xl border border-brand-leaf/25 shadow-sm space-y-3">
+        <div className="bg-white p-4 sm:p-5 rounded-2xl border border-brand-leaf/25 shadow-sm space-y-2.5 sm:space-y-3">
           <div className="flex items-center justify-between text-brand-muted">
-            <span className="text-xs font-bold uppercase tracking-wider">{t('bms.dashboard.totalOrders')}</span>
+            <span className="text-[11px] sm:text-xs font-bold uppercase tracking-wider">{t('bms.dashboard.totalOrders')}</span>
             <div className="w-8 h-8 rounded-lg bg-brand-surface text-brand-forest flex items-center justify-center">
               <ShoppingBag className="w-4 h-4" />
             </div>
           </div>
           <div>
-            <div className="text-2xl font-black font-serif text-brand-charcoal">
+            <div className="text-xl sm:text-2xl font-black font-serif text-brand-charcoal">
               {orders.length}
             </div>
-            <div className="text-[11px] text-brand-leaf font-bold mt-1">
+            <div className="text-[10px] sm:text-[11px] text-brand-leaf font-bold mt-0.5">
               {onlineOrders.length} Online • {posOrders.length} Walk-in POS
             </div>
           </div>
         </div>
 
         {/* Net Profit (True Ledger) */}
-        <div className="bg-white p-5 rounded-2xl border border-brand-leaf/25 shadow-sm space-y-3">
+        <div className="bg-white p-4 sm:p-5 rounded-2xl border border-brand-leaf/25 shadow-sm space-y-2.5 sm:space-y-3">
           <div className="flex items-center justify-between text-brand-muted">
-            <span className="text-xs font-bold uppercase tracking-wider">{t('bms.dashboard.netProfit')}</span>
+            <span className="text-[11px] sm:text-xs font-bold uppercase tracking-wider">{t('bms.dashboard.netProfit')}</span>
             <div className="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center">
               <TrendingUp className="w-4 h-4" />
             </div>
           </div>
           <div>
-            <div className={`text-2xl font-black font-serif ${netProfit >= 0 ? 'text-emerald-700' : 'text-rose-600'}`}>
+            <div className={`text-xl sm:text-2xl font-black font-serif ${netProfit >= 0 ? 'text-emerald-700' : 'text-rose-600'}`}>
               {formatPrice(netProfit)}
             </div>
-            <div className="text-[11px] text-brand-muted mt-1">
+            <div className="text-[10px] sm:text-[11px] text-brand-muted mt-0.5">
               Gross less {formatPrice(totalExpensesAmount)} expenses
             </div>
           </div>
         </div>
 
         {/* Low Stock Alerts */}
-        <div className="bg-white p-5 rounded-2xl border border-brand-leaf/25 shadow-sm space-y-3">
+        <div className="bg-white p-4 sm:p-5 rounded-2xl border border-brand-leaf/25 shadow-sm space-y-2.5 sm:space-y-3">
           <div className="flex items-center justify-between text-brand-muted">
-            <span className="text-xs font-bold uppercase tracking-wider">{t('bms.dashboard.lowStockAlerts')}</span>
+            <span className="text-[11px] sm:text-xs font-bold uppercase tracking-wider">{t('bms.dashboard.lowStockAlerts')}</span>
             <div className="w-8 h-8 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center">
               <AlertTriangle className="w-4 h-4" />
             </div>
           </div>
           <div>
-            <div className={`text-2xl font-black font-serif ${lowStockCount > 0 ? 'text-amber-600' : 'text-brand-forest'}`}>
+            <div className={`text-xl sm:text-2xl font-black font-serif ${lowStockCount > 0 ? 'text-amber-600' : 'text-brand-forest'}`}>
               {lowStockCount}
             </div>
-            <div className="text-[11px] text-brand-muted mt-1">
+            <div className="text-[10px] sm:text-[11px] text-brand-muted mt-0.5">
               Items at or below restock threshold
             </div>
           </div>
@@ -175,11 +175,11 @@ export const BmsDashboard = ({ onNavigate }) => {
       {orders.length === 0 ? (
         
         /* Clean Empty Analytics State */
-        <div className="bg-white rounded-3xl p-12 text-center border border-dashed border-brand-leaf/30 space-y-3">
-          <div className="w-16 h-16 mx-auto rounded-2xl bg-brand-surface flex items-center justify-center text-brand-muted">
-            <Calendar className="w-8 h-8 text-brand-leaf" />
+        <div className="bg-white rounded-3xl p-8 sm:p-12 text-center border border-dashed border-brand-leaf/30 space-y-3">
+          <div className="w-14 h-14 sm:w-16 sm:h-16 mx-auto rounded-2xl bg-brand-surface flex items-center justify-center text-brand-muted">
+            <Calendar className="w-7 h-7 sm:w-8 sm:h-8 text-brand-leaf" />
           </div>
-          <h3 className="text-lg font-bold font-serif text-brand-forest">
+          <h3 className="text-base sm:text-lg font-bold font-serif text-brand-forest">
             No Transactions Recorded Yet
           </h3>
           <p className="text-xs text-brand-charcoal/70 max-w-sm mx-auto leading-relaxed">
@@ -198,12 +198,12 @@ export const BmsDashboard = ({ onNavigate }) => {
 
       ) : (
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
           
           {/* Sales by Region */}
-          <div className="bg-white p-6 rounded-2xl border border-brand-leaf/20 shadow-sm space-y-4">
+          <div className="bg-white p-4 sm:p-6 rounded-2xl border border-brand-leaf/20 shadow-sm space-y-3 sm:space-y-4">
             <div className="flex items-center justify-between">
-              <h3 className="text-sm font-bold font-serif text-brand-forest">
+              <h3 className="text-xs sm:text-sm font-bold font-serif text-brand-forest">
                 {t('bms.dashboard.salesByRegion')}
               </h3>
               <MapPin className="w-4 h-4 text-brand-leaf" />
@@ -232,9 +232,9 @@ export const BmsDashboard = ({ onNavigate }) => {
           </div>
 
           {/* Recent Orders Overview */}
-          <div className="bg-white p-6 rounded-2xl border border-brand-leaf/20 shadow-sm space-y-4">
+          <div className="bg-white p-4 sm:p-6 rounded-2xl border border-brand-leaf/20 shadow-sm space-y-3 sm:space-y-4">
             <div className="flex items-center justify-between">
-              <h3 className="text-sm font-bold font-serif text-brand-forest">
+              <h3 className="text-xs sm:text-sm font-bold font-serif text-brand-forest">
                 {t('bms.dashboard.recentActivity')}
               </h3>
               <button
@@ -275,4 +275,3 @@ export const BmsDashboard = ({ onNavigate }) => {
     </div>
   );
 };
-

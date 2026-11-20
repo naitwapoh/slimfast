@@ -129,15 +129,15 @@ export const BmsStaff = () => {
   };
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6 sm:space-y-8">
       
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4">
         <div>
-          <h2 className="text-2xl font-black font-serif text-brand-forest">
+          <h2 className="text-xl sm:text-2xl font-black font-serif text-brand-forest">
             {t('bms.staff.title')}
           </h2>
-          <p className="text-xs text-brand-charcoal/70 mt-1">
+          <p className="text-xs text-brand-charcoal/70 mt-0.5 sm:mt-1">
             Admin registers workers and assigns them their passwords.
           </p>
         </div>
@@ -162,51 +162,51 @@ export const BmsStaff = () => {
       )}
 
       {/* Admin Identity Card */}
-      <div className="bg-brand-forest text-white p-5 rounded-2xl flex items-center justify-between border border-brand-leaf/30 shadow-sm">
-        <div className="flex items-center space-x-3.5">
-          <div className="w-11 h-11 rounded-xl bg-white/10 flex items-center justify-center text-brand-leaf border border-white/20 font-black">
+      <div className="bg-brand-forest text-white p-4 sm:p-5 rounded-2xl flex items-center justify-between border border-brand-leaf/30 shadow-sm">
+        <div className="flex items-center space-x-3">
+          <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-white/10 flex items-center justify-center text-brand-leaf border border-white/20 font-black shrink-0">
             A
           </div>
           <div>
-            <h4 className="text-sm font-bold">Admin (Business Owner)</h4>
-            <p className="text-xs text-white/70">Master Administrator: name: <code className="font-mono font-bold text-brand-leaf">admin</code></p>
+            <h4 className="text-xs sm:text-sm font-bold">Admin (Business Owner)</h4>
+            <p className="text-[11px] text-white/70">Master Administrator: name: <code className="font-mono font-bold text-brand-leaf">admin</code></p>
           </div>
         </div>
-        <span className="px-3 py-1 rounded-full bg-brand-leaf text-white text-[10px] font-black uppercase">
-          Master Authority
+        <span className="px-2.5 py-1 rounded-full bg-brand-leaf text-white text-[9px] sm:text-[10px] font-black uppercase shrink-0">
+          Master
         </span>
       </div>
 
       {/* Staff Members List */}
       <div className="bg-white rounded-3xl border border-brand-leaf/25 shadow-sm overflow-hidden">
-        <div className="p-5 border-b border-brand-leaf/20 bg-brand-surface flex items-center justify-between">
-          <h3 className="text-sm font-bold font-serif text-brand-forest">
+        <div className="p-4 sm:p-5 border-b border-brand-leaf/20 bg-brand-surface flex items-center justify-between">
+          <h3 className="text-xs sm:text-sm font-bold font-serif text-brand-forest">
             Registered Shop Workers ({staffList.length})
           </h3>
-          <span className="text-xs text-brand-muted">Credentials issued by Admin</span>
+          <span className="text-[11px] text-brand-muted">Credentials issued by Admin</span>
         </div>
 
         {staffList.length === 0 ? (
-          <div className="p-10 text-center text-xs text-brand-muted">
+          <div className="p-8 sm:p-10 text-center text-xs text-brand-muted">
             No shop workers registered yet. Click "+ Register New Worker" to create worker logins.
           </div>
         ) : (
           <div className="divide-y divide-brand-leaf/10">
             {staffList.map((member) => (
-              <div key={member.id} className="p-4 sm:p-5 flex items-center justify-between gap-4 hover:bg-brand-surface/40 transition-colors">
-                <div className="flex items-center space-x-3.5">
-                  <div className="w-10 h-10 rounded-xl bg-brand-surface flex items-center justify-center text-brand-forest border border-brand-leaf/20 font-bold">
+              <div key={member.id} className="p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4 hover:bg-brand-surface/40 transition-colors">
+                <div className="flex items-start sm:items-center space-x-3">
+                  <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-brand-surface flex items-center justify-center text-brand-forest border border-brand-leaf/20 font-bold shrink-0">
                     {(member.name || 'W')[0].toUpperCase()}
                   </div>
                   <div>
-                    <h4 className="text-sm font-bold text-brand-charcoal">
+                    <h4 className="text-xs sm:text-sm font-bold text-brand-charcoal">
                       {member.name}
                     </h4>
-                    <p className="text-xs text-brand-muted mt-0.5">
-                      Username/Email: <strong className="text-brand-charcoal">{member.email || member.name}</strong> • Password: <code className="font-mono bg-brand-surface px-1.5 py-0.5 rounded border border-brand-leaf/20">{member.password || '••••••'}</code>
+                    <p className="text-[11px] text-brand-muted mt-0.5">
+                      Username: <strong className="text-brand-charcoal">{member.email || member.name}</strong> • Password: <code className="font-mono bg-brand-surface px-1.5 py-0.5 rounded border border-brand-leaf/20">{member.password || '••••••'}</code>
                     </p>
                     <div className="flex items-center space-x-2 mt-1">
-                      <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-brand-surface text-brand-forest border border-brand-leaf/20">
+                      <span className="px-2 py-0.5 rounded text-[9px] sm:text-[10px] font-bold uppercase bg-brand-surface text-brand-forest border border-brand-leaf/20">
                         {member.role === 'owner' ? 'Owner' : 'Shop Worker'}
                       </span>
                       <span className={`text-[10px] font-bold ${member.isActive !== false ? 'text-emerald-700' : 'text-red-600'}`}>
@@ -217,7 +217,7 @@ export const BmsStaff = () => {
                 </div>
 
                 {isOwner && (
-                  <div className="flex items-center space-x-2">
+                  <div className="flex items-center space-x-2 self-end sm:self-auto pt-2 sm:pt-0 border-t sm:border-t-0 border-brand-leaf/10 w-full sm:w-auto justify-end">
                     <button
                       type="button"
                       onClick={() => handleToggleStaffStatus(member)}
@@ -246,55 +246,47 @@ export const BmsStaff = () => {
       </div>
 
       {/* Audit Log / Employee Activity Trail */}
-      <div className="bg-white rounded-3xl border border-brand-leaf/25 shadow-sm p-6 space-y-4">
+      <div className="bg-white rounded-3xl border border-brand-leaf/25 shadow-sm p-4 sm:p-6 space-y-4">
         <div className="flex items-center space-x-2">
-          <Clock className="w-4 h-4 text-brand-leaf" />
+          <Clock className="w-4 h-4 text-brand-forest" />
           <h3 className="text-sm font-bold font-serif text-brand-forest">
-            {t('bms.staff.auditLogTitle')}
+            Activity & Security Audit Log
           </h3>
         </div>
 
-        {auditLogs.length === 0 ? (
-          <div className="py-8 text-center text-xs text-brand-muted">
-            {t('bms.staff.auditEmpty')}
-          </div>
-        ) : (
-          <div className="space-y-2.5 max-h-96 overflow-y-auto">
-            {auditLogs.map((log) => (
-              <div 
-                key={log.id} 
-                className="p-3 bg-brand-surface/60 rounded-xl border border-brand-leaf/20 text-xs flex flex-col sm:flex-row sm:items-center justify-between gap-1"
-              >
-                <div>
-                  <span className="font-semibold text-brand-charcoal">{log.action}</span>
-                  <span className="text-brand-muted ml-2">by <strong>{log.performedBy}</strong></span>
-                </div>
-                <span className="text-[10px] text-brand-muted font-mono shrink-0">
-                  {new Date(log.timestamp).toLocaleString()}
+        <div className="divide-y divide-brand-leaf/10 max-h-64 overflow-y-auto">
+          {auditLogs.length === 0 ? (
+            <p className="text-xs text-brand-muted py-4">No audit logs recorded yet.</p>
+          ) : (
+            auditLogs.slice(0, 15).map((log) => (
+              <div key={log.id} className="py-2.5 flex items-center justify-between text-xs gap-3">
+                <span className="text-brand-charcoal">{log.action}</span>
+                <span className="text-[10px] text-brand-muted shrink-0 font-mono">
+                  {new Date(log.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                 </span>
               </div>
-            ))}
-          </div>
-        )}
+            ))
+          )}
+        </div>
       </div>
 
-      {/* Register Worker Modal */}
+      {/* Add Worker Modal (Scrollable for mobile keyboards) */}
       {modalOpen && (
-        <div className="fixed inset-0 z-50 overflow-y-auto bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 animate-fadeIn">
+        <div className="fixed inset-0 z-50 overflow-y-auto bg-black/60 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 animate-fadeIn">
           <div 
-            className="bg-white rounded-3xl max-w-md w-full shadow-2xl border border-brand-leaf/30 p-6 space-y-4 relative"
+            className="bg-white rounded-3xl max-w-md w-full max-h-[90vh] overflow-y-auto shadow-2xl border border-brand-leaf/30 p-5 sm:p-6 space-y-4 relative"
             onClick={(e) => e.stopPropagation()}
           >
             <button
               type="button"
               onClick={() => setModalOpen(false)}
-              className="absolute top-5 right-5 p-2 rounded-full hover:bg-brand-surface text-brand-charcoal"
+              className="absolute top-4 right-4 sm:top-5 sm:right-5 p-2 rounded-full hover:bg-brand-surface text-brand-charcoal"
             >
               <X className="w-5 h-5" />
             </button>
 
-            <h3 className="text-xl font-bold font-serif text-brand-forest">
-              Register Worker & Assign Password
+            <h3 className="text-lg sm:text-xl font-bold font-serif text-brand-forest">
+              Register Shop Worker
             </h3>
 
             {errorMsg && (
@@ -304,70 +296,57 @@ export const BmsStaff = () => {
               </div>
             )}
 
-            <form onSubmit={handleCreateWorker} className="space-y-4">
+            <form onSubmit={handleCreateWorker} className="space-y-3.5">
               <div>
                 <label className="block text-xs font-bold text-brand-charcoal mb-1">
-                  Worker Name *
+                  Worker Full Name *
                 </label>
                 <input
                   type="text"
                   required
-                  placeholder="e.g. Bakari Mwinyi"
+                  placeholder="e.g. Fatma Bakari"
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-brand-leaf/30 text-xs bg-brand-surface/40"
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-brand-leaf/30 text-xs font-semibold bg-brand-surface/40"
                 />
               </div>
 
               <div>
                 <label className="block text-xs font-bold text-brand-charcoal mb-1">
-                  Worker Login Username / Email (Optional)
+                  Assigned Password *
                 </label>
                 <input
                   type="text"
-                  placeholder="e.g. bakari (will default to name if empty)"
-                  value={formData.email}
-                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-brand-leaf/30 text-xs bg-brand-surface/40"
+                  required
+                  placeholder="e.g. worker2026"
+                  value={formData.password}
+                  onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-brand-leaf/30 text-xs font-mono font-bold bg-brand-surface/40"
                 />
+                <span className="text-[10px] text-brand-muted">Provide this password to the worker for logging in.</span>
               </div>
 
               <div>
                 <label className="block text-xs font-bold text-brand-charcoal mb-1">
-                  Assign Password *
+                  Role Permission
                 </label>
-                <div className="relative">
-                  <Key className="w-4 h-4 absolute left-3 top-3 text-brand-muted" />
-                  <input
-                    type="text"
-                    required
-                    placeholder="Enter password for this worker"
-                    value={formData.password}
-                    onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                    className="w-full pl-9 pr-3 py-2.5 rounded-xl border border-brand-leaf/30 text-xs bg-brand-surface/40 font-mono font-bold"
-                  />
-                </div>
-                <span className="text-[10px] text-brand-muted mt-1 block">
-                  Give this password to the worker so they can log into the POS & Order Fulfillment desk.
-                </span>
+                <select
+                  value={formData.role}
+                  onChange={(e) => setFormData({ ...formData, role: e.target.value })}
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-brand-leaf/30 text-xs font-bold bg-brand-surface/40"
+                >
+                  <option value="worker">Shop Worker (POS, Orders & Stock Check)</option>
+                  <option value="owner">Administrator (Full Access)</option>
+                </select>
               </div>
 
-              <div className="pt-2 flex justify-end space-x-2">
-                <button
-                  type="button"
-                  onClick={() => setModalOpen(false)}
-                  className="px-4 py-2 rounded-xl border text-xs font-bold text-brand-charcoal"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  disabled={createLoading}
-                  className="px-5 py-2 rounded-xl bg-brand-forest hover:bg-brand-leaf text-white text-xs font-bold shadow-md"
-                >
-                  {createLoading ? 'Registering...' : 'Register Worker'}
-                </button>
-              </div>
+              <button
+                type="submit"
+                disabled={createLoading}
+                className="w-full py-3.5 rounded-xl bg-brand-forest hover:bg-brand-leaf text-white font-bold text-xs shadow-md transition-all"
+              >
+                {createLoading ? 'Registering Worker...' : 'Create Worker Account'}
+              </button>
             </form>
           </div>
         </div>
