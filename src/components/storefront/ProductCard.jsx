@@ -24,7 +24,7 @@ export const ProductCard = ({ product, onViewDetails }) => {
             className="w-full h-48 object-contain transform group-hover:scale-105 transition-transform duration-300 drop-shadow-md"
             onError={(e) => {
               e.target.onerror = null;
-              e.target.src = '/leaf.svg';
+              e.target.src = '/logo.jpg';
             }}
           />
         ) : (

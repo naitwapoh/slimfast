@@ -21,7 +21,7 @@ export const DEFAULT_SLIMFAST_PRODUCTS = [
     ingredients: "Moringa oleifera, Black Pepper, Great Basil, Garcinia Cambogia, Fennel",
     directions: "1 teaspoon in boiling water, steep 4 minutes, 1 cup daily before bed.",
     benefits: "Visceral belly fat burn, Digestive detox, Anti-bloating, Metabolism boost, Blood sugar support",
-    imageUrl: "https://images.unsplash.com/photo-1576092768241-dec231879fc3?auto=format&fit=crop&w=600&q=80"
+    imageUrl: "/slimming-tea.jpg"
   },
   {
     id: "sf-bean-powder",
@@ -36,7 +36,7 @@ export const DEFAULT_SLIMFAST_PRODUCTS = [
     ingredients: "Unroasted Arabica AAA Decaffeinated Beans, Green Tea Extracts, Dandelion Purifying Herbs",
     directions: "1 coffee spoon in boiling water every morning before or during breakfast.",
     benefits: "Appetite suppression, Thermogenesis, Cholesterol balance, Clean all-day vitality",
-    imageUrl: "https://images.unsplash.com/photo-1544787219-7f47ccb76574?auto=format&fit=crop&w=600&q=80"
+    imageUrl: "/bean-powder.jpg"
   },
   {
     id: "sf-full-combo",
@@ -51,7 +51,7 @@ export const DEFAULT_SLIMFAST_PRODUCTS = [
     ingredients: "Morning Arabica Bean Powder + Evening Moringa Slimming Tea synergistic treatment",
     directions: "Morning: 1 spoon Bean Powder with breakfast. Evening: 1 cup Slimming Tea before sleep.",
     benefits: "Full 24-hour fat burn, appetite control, total digestive cleansing & body detox",
-    imageUrl: "https://images.unsplash.com/photo-1540420773420-3366772f4999?auto=format&fit=crop&w=600&q=80"
+    imageUrl: "/duo-combo.jpg"
   }
 ];
 
