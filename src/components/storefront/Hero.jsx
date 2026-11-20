@@ -72,9 +72,9 @@ export const Hero = () => {
                 <div className="absolute -top-12 -right-12 w-40 h-40 bg-brand-leaf/20 rounded-full blur-2xl" />
 
                 {/* Hero Showcase Badge */}
-                <div className="flex items-center justify-between mb-6">
+                <div className="flex items-center justify-between mb-4">
                   <div className="flex items-center space-x-2">
-                    <span className="w-3 h-3 rounded-full bg-brand-leaf" />
+                    <span className="w-3 h-3 rounded-full bg-brand-leaf animate-pulse" />
                     <span className="text-xs font-bold uppercase tracking-wider text-brand-forest">SLIMFAST Signature</span>
                   </div>
                   <span className="px-3 py-1 bg-brand-forest text-white text-[11px] font-black rounded-full uppercase tracking-wider">
@@ -82,17 +82,30 @@ export const Hero = () => {
                   </span>
                 </div>
 
-                {/* Product Imagery Graphics Container */}
-                <div className="relative bg-gradient-to-br from-brand-surface to-brand-leaf/10 rounded-2xl p-6 flex flex-col items-center justify-center text-center border border-brand-leaf/20 min-h-[260px]">
-                  <div className="w-24 h-24 rounded-2xl bg-brand-forest flex items-center justify-center text-white shadow-xl mb-4 transform hover:rotate-3 transition-transform">
-                    <Award className="w-12 h-12 text-brand-leaf" />
+                {/* Product Imagery Graphics Container with Woman Ambassador Image */}
+                <div className="relative rounded-2xl overflow-hidden border border-brand-leaf/30 shadow-md group">
+                  <div className="relative h-72 sm:h-80 w-full overflow-hidden bg-brand-surface">
+                    <img 
+                      src="/signature-woman.jpg" 
+                      alt="SLIMFAST Signature Herbal Ambassador"
+                      className="w-full h-full object-cover object-top transform group-hover:scale-105 transition-transform duration-700"
+                      onError={(e) => {
+                        e.target.onerror = null;
+                        e.target.src = 'https://i.postimg.cc/dtsTvZZQ/Gemini-Generated-Image-yyzsooyyzsooyyzs.jpg';
+                      }}
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/25 to-transparent flex flex-col justify-end p-5 text-white">
+                      <span className="text-[10px] font-black uppercase tracking-widest text-brand-leaf">
+                        SLIMFAST Natural Results
+                      </span>
+                      <h3 className="text-lg font-black font-serif text-white leading-tight">
+                        Authentic Botanical Transformation
+                      </h3>
+                      <p className="text-[11px] text-white/90 mt-1 line-clamp-2">
+                        Real results with Moringa oleifera, Unroasted Arabica & Garcinia herbal blends.
+                      </p>
+                    </div>
                   </div>
-                  <h3 className="text-xl font-bold font-serif text-brand-forest">
-                    Moringa & Unroasted Arabica
-                  </h3>
-                  <p className="text-xs text-brand-charcoal/80 mt-1.5 max-w-xs">
-                    Synergistic blend with Garcinia Cambogia, Fennel, Dandelion & Purifying Green Herbs.
-                  </p>
                 </div>
 
                 {/* Mini Features List */}

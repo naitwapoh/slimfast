@@ -113,7 +113,15 @@ export const BmsPortal = ({ onBackToStore }) => {
           </button>
 
           <div className="flex items-center space-x-2 pl-2 border-l border-brand-leaf/20">
-            <Leaf className="w-5 h-5 text-brand-forest" />
+            <img 
+              src="/logo.jpg" 
+              alt="SLIMFAST Logo" 
+              className="w-8 h-8 rounded-lg object-cover border border-brand-leaf/30"
+              onError={(e) => {
+                e.target.onerror = null;
+                e.target.src = 'https://i.postimg.cc/T3Pmj5Rf/Gemini-Generated-Image-omoe51omoe51omoe.jpg';
+              }}
+            />
             <span className="text-base font-black font-serif text-brand-forest tracking-wide hidden md:inline">
               SLIMFAST BMS
             </span>

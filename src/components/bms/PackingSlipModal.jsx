@@ -47,8 +47,16 @@ export const PackingSlipModal = ({ order, onClose }) => {
           {/* Header */}
           <div className="flex items-start justify-between border-b pb-6">
             <div>
-              <div className="flex items-center space-x-2">
-                <Leaf className="w-6 h-6 text-brand-forest" />
+              <div className="flex items-center space-x-2.5">
+                <img 
+                  src="/logo.jpg" 
+                  alt="SLIMFAST Logo" 
+                  className="w-10 h-10 rounded-xl object-cover border border-brand-leaf/30"
+                  onError={(e) => {
+                    e.target.onerror = null;
+                    e.target.src = 'https://i.postimg.cc/T3Pmj5Rf/Gemini-Generated-Image-omoe51omoe51omoe.jpg';
+                  }}
+                />
                 <h1 className="text-2xl font-black font-serif text-brand-forest tracking-wide">
                   SLIMFAST
                 </h1>

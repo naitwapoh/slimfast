@@ -41,8 +41,16 @@ export const Navbar = ({ onOpenPortal }) => {
           
           {/* Brand Logo */}
           <a href="#" className="flex items-center space-x-3 group">
-            <div className="w-11 h-11 rounded-xl bg-brand-forest flex items-center justify-center text-white shadow-md group-hover:bg-brand-leaf transition-colors duration-300">
-              <Leaf className="w-6 h-6 text-brand-leaf group-hover:text-white transition-colors" />
+            <div className="w-12 h-12 rounded-2xl overflow-hidden shadow-md border border-brand-leaf/30 group-hover:border-brand-forest transition-colors duration-300 bg-white p-0.5">
+              <img 
+                src="/logo.jpg" 
+                alt="SLIMFAST Logo" 
+                className="w-full h-full object-cover rounded-xl"
+                onError={(e) => {
+                  e.target.onerror = null;
+                  e.target.src = 'https://i.postimg.cc/T3Pmj5Rf/Gemini-Generated-Image-omoe51omoe51omoe.jpg';
+                }}
+              />
             </div>
             <div>
               <span className="text-2xl font-black tracking-wider text-brand-forest font-serif block leading-none">
