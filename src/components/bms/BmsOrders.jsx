@@ -11,7 +11,8 @@ import {
   Phone, 
   MapPin,
   AlertCircle,
-  MessageSquare
+  MessageSquare,
+  Receipt
 } from 'lucide-react';
 import { collection, onSnapshot, doc, updateDoc, deleteDoc, addDoc } from 'firebase/firestore';
 import { db } from '../../firebase';
@@ -19,6 +20,7 @@ import { useAuth } from '../../context/AuthContext';
 import { useLanguage } from '../../context/LanguageContext';
 import { useCurrency } from '../../context/CurrencyContext';
 import { PackingSlipModal } from './PackingSlipModal';
+import { CustomerReceiptModal } from './CustomerReceiptModal';
 
 export const BmsOrders = () => {
   const { t } = useLanguage();
@@ -29,6 +31,7 @@ export const BmsOrders = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('ALL');
   const [selectedPackingSlipOrder, setSelectedPackingSlipOrder] = useState(null);
+  const [selectedReceiptOrder, setSelectedReceiptOrder] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -174,14 +177,14 @@ export const BmsOrders = () => {
             {t('bms.orders.emptyOrders')}
           </h3>
           <p className="text-xs text-brand-charcoal/70 max-w-sm mx-auto">
-            Online storefront orders and walk-in counter sales will appear here for fulfillment and packing slip generation.
+            Online storefront orders and walk-in counter sales will appear here for fulfillment, receipts, and packing slip generation.
           </p>
         </div>
 
       ) : (
 
         <>
-          {/* MOBILE CARD VIEW: Designed specifically for smartphones */}
+          {/* MOBILE CARD VIEW FOR SMARTPHONES */}
           <div className="block md:hidden space-y-3">
             {filteredOrders.map((ord) => (
               <div 
@@ -261,22 +264,33 @@ export const BmsOrders = () => {
                   </div>
                 </div>
 
-                {/* Actions: Packing Slip & Delete */}
-                <div className="flex items-center justify-between pt-1">
+                {/* Actions: Receipt, Packing Slip & Delete */}
+                <div className="flex items-center justify-between gap-2 pt-1">
+                  {/* Customer Receipt Button */}
+                  <button
+                    type="button"
+                    onClick={() => setSelectedReceiptOrder(ord)}
+                    className="flex-1 py-2 px-2.5 rounded-xl bg-brand-forest text-white text-xs font-bold flex items-center justify-center space-x-1 shadow-sm"
+                  >
+                    <Receipt className="w-3.5 h-3.5" />
+                    <span>Receipt</span>
+                  </button>
+
+                  {/* Packing Slip Button */}
                   <button
                     type="button"
                     onClick={() => setSelectedPackingSlipOrder(ord)}
-                    className="flex-1 py-2 px-3 rounded-xl bg-brand-forest text-white text-xs font-bold flex items-center justify-center space-x-1.5 shadow-sm"
+                    className="flex-1 py-2 px-2.5 rounded-xl bg-brand-surface text-brand-forest border border-brand-leaf/30 text-xs font-bold flex items-center justify-center space-x-1"
                   >
                     <Printer className="w-3.5 h-3.5" />
-                    <span>Print Packing Slip</span>
+                    <span>Slip</span>
                   </button>
 
                   {isOwner && (
                     <button
                       type="button"
                       onClick={() => handleDeleteOrder(ord.id)}
-                      className="p-2 ml-2 rounded-xl text-brand-muted hover:text-red-600 border border-brand-leaf/20 hover:bg-red-50"
+                      className="p-2 rounded-xl text-brand-muted hover:text-red-600 border border-brand-leaf/20 hover:bg-red-50"
                       title="Delete order"
                     >
                       <Trash2 className="w-4 h-4" />
@@ -287,7 +301,7 @@ export const BmsOrders = () => {
             ))}
           </div>
 
-          {/* DESKTOP TABLE VIEW: For tablet and desktop screens */}
+          {/* DESKTOP TABLE VIEW */}
           <div className="hidden md:block bg-white rounded-3xl border border-brand-leaf/25 shadow-sm overflow-hidden">
             <div className="overflow-x-auto">
               <table className="w-full text-left text-xs">
@@ -381,9 +395,20 @@ export const BmsOrders = () => {
                         </select>
                       </td>
 
-                      {/* Actions: Print Slip & Owner Delete */}
+                      {/* Actions: Customer Receipt, Packing Slip & Delete */}
                       <td className="p-4 text-right">
-                        <div className="flex items-center justify-end space-x-2">
+                        <div className="flex items-center justify-end space-x-1.5">
+                          {/* Official Customer Receipt Button */}
+                          <button
+                            type="button"
+                            onClick={() => setSelectedReceiptOrder(ord)}
+                            className="p-2 rounded-xl bg-brand-forest text-white hover:bg-brand-leaf transition-colors shadow-sm"
+                            title="Generate Customer Receipt"
+                          >
+                            <Receipt className="w-4 h-4" />
+                          </button>
+
+                          {/* Packing Slip Button */}
                           <button
                             type="button"
                             onClick={() => setSelectedPackingSlipOrder(ord)}
@@ -414,6 +439,14 @@ export const BmsOrders = () => {
           </div>
         </>
 
+      )}
+
+      {/* Customer Official Receipt Modal */}
+      {selectedReceiptOrder && (
+        <CustomerReceiptModal
+          order={selectedReceiptOrder}
+          onClose={() => setSelectedReceiptOrder(null)}
+        />
       )}
 
       {/* Packing Slip Modal */}

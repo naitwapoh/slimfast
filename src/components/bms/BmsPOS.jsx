@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { ShoppingCart, CheckCircle, AlertCircle, Printer, User, DollarSign, Plus, Minus } from 'lucide-react';
+import { ShoppingCart, CheckCircle, AlertCircle, Printer, User, DollarSign, Plus, Minus, Receipt, MessageSquare } from 'lucide-react';
 import { collection, onSnapshot, addDoc, doc, updateDoc, increment } from 'firebase/firestore';
 import { db } from '../../firebase';
 import { useAuth } from '../../context/AuthContext';
 import { useLanguage } from '../../context/LanguageContext';
 import { useCurrency } from '../../context/CurrencyContext';
-import { PackingSlipModal } from './PackingSlipModal';
+import { CustomerReceiptModal } from './CustomerReceiptModal';
 
 export const BmsPOS = () => {
   const { t } = useLanguage();
@@ -17,11 +17,13 @@ export const BmsPOS = () => {
   const [quantity, setQuantity] = useState(1);
   const [channel, setChannel] = useState('walk-in'); // 'walk-in' or 'online'
   const [customerName, setCustomerName] = useState('');
+  const [customerPhone, setCustomerPhone] = useState('');
   const [paymentMethod, setPaymentMethod] = useState('Cash');
   const [loading, setLoading] = useState(false);
   const [successMessage, setSuccessMessage] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
   const [lastSaleReceipt, setLastSaleReceipt] = useState(null);
+  const [selectedReceiptOrder, setSelectedReceiptOrder] = useState(null);
 
   // Read available products
   useEffect(() => {
@@ -63,7 +65,7 @@ export const BmsPOS = () => {
     const saleRecord = {
       orderId,
       customerName: customerName || (channel === 'online' ? 'Online Customer' : 'Walk-in Customer'),
-      phoneNumber: channel === 'online' ? 'Online WhatsApp/Phone' : 'Shop Counter',
+      phoneNumber: customerPhone || (channel === 'online' ? 'Online Customer Phone' : 'Shop Counter'),
       country: 'Tanzania',
       city: 'Local Area',
       address: channel === 'online' ? 'Delivery via Courier' : 'Direct Pickup Counter',
@@ -107,9 +109,13 @@ export const BmsPOS = () => {
 
       setSuccessMessage(t('bms.pos.saleSuccess'));
       setLastSaleReceipt(saleRecord);
+      // Automatically open the official Customer Receipt
+      setSelectedReceiptOrder(saleRecord);
+
       // Reset form
       setQuantity(1);
       setCustomerName('');
+      setCustomerPhone('');
     } catch (err) {
       console.error('POS Sale error:', err);
       setErrorMessage(err.message || 'Error processing sale.');
@@ -136,9 +142,20 @@ export const BmsPOS = () => {
         {/* Entry Form */}
         <div className="lg:col-span-7 bg-white p-4 sm:p-7 rounded-3xl border border-brand-leaf/25 shadow-sm space-y-4 sm:space-y-5">
           {successMessage && (
-            <div className="p-3.5 bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs rounded-xl flex items-center space-x-2">
-              <CheckCircle className="w-4 h-4 shrink-0 text-emerald-600" />
-              <span>{successMessage}</span>
+            <div className="p-3.5 bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs rounded-xl flex items-center justify-between">
+              <div className="flex items-center space-x-2">
+                <CheckCircle className="w-4 h-4 shrink-0 text-emerald-600" />
+                <span>{successMessage}</span>
+              </div>
+              {lastSaleReceipt && (
+                <button
+                  type="button"
+                  onClick={() => setSelectedReceiptOrder(lastSaleReceipt)}
+                  className="px-2.5 py-1 bg-emerald-600 text-white rounded-lg text-xs font-bold hover:bg-emerald-700"
+                >
+                  View Receipt
+                </button>
+              )}
             </div>
           )}
 
@@ -252,19 +269,35 @@ export const BmsPOS = () => {
               </div>
             </div>
 
-            {/* Customer Name */}
-            <div>
-              <label className="block text-xs font-bold text-brand-charcoal mb-1">
-                Customer Name (Optional)
-              </label>
-              <div className="relative">
-                <User className="w-4 h-4 absolute left-3 top-3.5 text-brand-muted" />
+            {/* Customer Name & Phone for Receipt */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div>
+                <label className="block text-xs font-bold text-brand-charcoal mb-1">
+                  Customer Name (Optional)
+                </label>
+                <div className="relative">
+                  <User className="w-4 h-4 absolute left-3 top-3.5 text-brand-muted" />
+                  <input
+                    type="text"
+                    placeholder="e.g. Amina Juma"
+                    value={customerName}
+                    onChange={(e) => setCustomerName(e.target.value)}
+                    className="w-full pl-9 pr-3 py-2.5 sm:py-3 rounded-xl border border-brand-leaf/30 text-xs text-brand-charcoal focus:ring-2 focus:ring-brand-forest focus:outline-none bg-brand-surface/40"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-bold text-brand-charcoal mb-1">
+                  Customer Phone / WhatsApp
+                </label>
                 <input
-                  type="text"
-                  placeholder="e.g. Walk-in Counter Customer"
-                  value={customerName}
-                  onChange={(e) => setCustomerName(e.target.value)}
-                  className="w-full pl-9 pr-3 py-2.5 sm:py-3 rounded-xl border border-brand-leaf/30 text-xs text-brand-charcoal focus:ring-2 focus:ring-brand-forest focus:outline-none bg-brand-surface/40"
+                  type="tel"
+                  inputMode="tel"
+                  placeholder="e.g. +255 7..."
+                  value={customerPhone}
+                  onChange={(e) => setCustomerPhone(e.target.value)}
+                  className="w-full px-3.5 py-2.5 sm:py-3 rounded-xl border border-brand-leaf/30 text-xs text-brand-charcoal focus:ring-2 focus:ring-brand-forest focus:outline-none bg-brand-surface/40"
                 />
               </div>
             </div>
@@ -312,7 +345,7 @@ export const BmsPOS = () => {
                   : 'bg-brand-forest hover:bg-brand-leaf text-white hover:shadow-lg'
               }`}
             >
-              {loading ? 'Recording Sale...' : t('bms.pos.submitSale')}
+              {loading ? 'Recording Sale & Generating Receipt...' : 'Complete Sale & Create Receipt'}
             </button>
           </form>
         </div>
@@ -320,7 +353,7 @@ export const BmsPOS = () => {
         {/* Counter Receipt Preview */}
         <div className="lg:col-span-5 bg-white p-4 sm:p-7 rounded-3xl border border-brand-leaf/25 shadow-sm space-y-4">
           <div className="flex items-center space-x-2 border-b border-brand-leaf/20 pb-3">
-            <Printer className="w-4 h-4 text-brand-forest" />
+            <Receipt className="w-4 h-4 text-brand-forest" />
             <h3 className="text-sm font-bold font-serif text-brand-forest">
               Latest Sale Receipt
             </h3>
@@ -352,15 +385,36 @@ export const BmsPOS = () => {
                 <span className="text-brand-forest">Amount Paid:</span>
                 <span className="text-brand-leaf font-black">{formatPrice(lastSaleReceipt.totalTZS)}</span>
               </div>
+
+              {/* View & Print Official Customer Receipt Button */}
+              <div className="pt-2">
+                <button
+                  type="button"
+                  onClick={() => setSelectedReceiptOrder(lastSaleReceipt)}
+                  className="w-full py-2.5 px-3 rounded-xl bg-brand-forest hover:bg-brand-leaf text-white text-xs font-bold flex items-center justify-center space-x-2 shadow-sm transition-colors"
+                >
+                  <Receipt className="w-4 h-4" />
+                  <span>Open Official Customer Receipt</span>
+                </button>
+              </div>
             </div>
           ) : (
             <div className="text-center py-10 text-xs text-brand-muted">
-              Select product and complete sale to print or view counter receipt.
+              Select product and complete sale to print or view official customer receipt.
             </div>
           )}
         </div>
 
       </div>
+
+      {/* Customer Official Receipt Modal */}
+      {selectedReceiptOrder && (
+        <CustomerReceiptModal
+          order={selectedReceiptOrder}
+          onClose={() => setSelectedReceiptOrder(null)}
+        />
+      )}
+
     </div>
   );
 };

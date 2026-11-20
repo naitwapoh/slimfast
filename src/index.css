@@ -30,21 +30,22 @@
   background: #2E6F24;
 }
 
-/* Print styles for BMS Packing Slips & Invoices */
+/* Print styles for BMS Packing Slips & Customer Receipts */
 @media print {
   body * {
     visibility: hidden;
   }
-  #printable-slip, #printable-slip * {
+  #printable-slip, #printable-slip *,
+  #printable-receipt, #printable-receipt * {
     visibility: visible;
   }
-  #printable-slip {
+  #printable-slip, #printable-receipt {
     position: absolute;
     left: 0;
     top: 0;
     width: 100%;
     margin: 0;
-    padding: 20px;
+    padding: 24px;
     background: white;
     color: black;
   }
@@ -52,4 +53,3 @@
     display: none !important;
   }
 }
-
