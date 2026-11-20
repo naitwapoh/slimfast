@@ -141,8 +141,8 @@ export const translations = {
       processing: "Processing Your Order...",
       orderSuccessTitle: "Order Successfully Placed!",
       orderSuccessDesc: "Your order #{orderId} has been securely recorded. Click below to verify instantly with our official WhatsApp customer care desk.",
-      confirmWhatsApp: "Confirm Order via WhatsApp",
-      whatsappTemplate: "Hello SLIMFAST! I have just placed order #{orderId} for {items}. Total: {total}. Name: {name}, City: {city}, Country: {country}. Please confirm delivery details.",
+      confirmWhatsApp: "Make Payment & Confirm via WhatsApp (+255 752 613 616)",
+      whatsappTemplate: "Hello SLIMFAST! I have placed order #{orderId} for {items}. Total: {total}. Name: {name}, City: {city}, Country: {country}. Making payment via Mobile Money to official number +255 752 613 616. Please confirm delivery.",
       backToShop: "Back to Home",
       stockError: "Sorry, some items in your cart exceed available stock. Please adjust quantities."
     },
@@ -473,8 +473,8 @@ export const translations = {
       processing: "Inasindika Oda Yako...",
       orderSuccessTitle: "Oda Yako Imepokelewa Kikamilifu!",
       orderSuccessDesc: "Oda yako #{orderId} imehifadhiwa salama. Bonyeza kitufe hapa chini ili kuthibitisha mara moja na dawati letu rasmi la huduma kwa wateja kupitia WhatsApp.",
-      confirmWhatsApp: "Thibitisha Oda Kupitia WhatsApp",
-      whatsappTemplate: "Habari SLIMFAST! Nimeweka oda namba #{orderId} ya bidhaa: {items}. Jumla: {total}. Jina: {name}, Mji: {city}, Nchi: {country}. Naomba kuthibitishiwa usafirishaji.",
+      confirmWhatsApp: "Lipa na Thibitisha Oda kwa WhatsApp (+255 752 613 616)",
+      whatsappTemplate: "Habari SLIMFAST! Nimeweka oda namba #{orderId} ya: {items}. Jumla: {total}. Jina: {name}, Mji: {city}, Nchi: {country}. Nafanya malipo kupitia namba rasmi +255 752 613 616. Naomba kuthibitishiwa usafirishaji.",
       backToShop: "Rudi Mwanzo",
       stockError: "Samahani, baadhi ya bidhaa uliyochagua zimezidi idadi iliyopo ghala. Tafadhali punguza idadi."
     },

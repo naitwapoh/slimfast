@@ -184,7 +184,12 @@ export const CheckoutModal = ({ onClose }) => {
               </div>
             </div>
 
-            {/* WhatsApp Confirmation Action Button */}
+            {/* WhatsApp Confirmation & Payment Action Button */}
+            <div className="p-3 bg-emerald-50 rounded-xl border border-emerald-200 text-xs text-emerald-900 text-left space-y-1">
+              <p className="font-bold">WhatsApp Payment Desk: <span className="font-mono text-brand-forest">+255 752 613 616</span></p>
+              <p className="text-[11px] text-emerald-800">Send your order confirmation and Mobile Money payment (M-Pesa, Tigo Pesa, Airtel Money) directly via WhatsApp below.</p>
+            </div>
+
             <a
               href={generateWhatsAppLink()}
               target="_blank"
@@ -192,7 +197,7 @@ export const CheckoutModal = ({ onClose }) => {
               className="w-full py-4 rounded-xl bg-[#25D366] hover:bg-[#20ba59] text-white font-extrabold text-sm shadow-md flex items-center justify-center space-x-2 transition-all transform hover:scale-[1.02]"
             >
               <MessageSquare className="w-5 h-5 fill-current" />
-              <span>{t('checkout.confirmWhatsApp')}</span>
+              <span>Make Payment & Confirm Order via WhatsApp</span>
             </a>
 
             <button

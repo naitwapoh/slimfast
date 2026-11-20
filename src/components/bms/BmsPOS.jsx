@@ -15,6 +15,7 @@ export const BmsPOS = () => {
   const [products, setProducts] = useState([]);
   const [selectedProductId, setSelectedProductId] = useState('');
   const [quantity, setQuantity] = useState(1);
+  const [channel, setChannel] = useState('walk-in'); // 'walk-in' or 'online'
   const [customerName, setCustomerName] = useState('');
   const [paymentMethod, setPaymentMethod] = useState('Cash');
   const [loading, setLoading] = useState(false);
@@ -56,16 +57,16 @@ export const BmsPOS = () => {
     setErrorMessage('');
     setSuccessMessage('');
 
-    const orderId = 'POS-' + Math.floor(100000 + Math.random() * 900000);
+    const orderId = (channel === 'online' ? 'ONL-' : 'POS-') + Math.floor(100000 + Math.random() * 900000);
     const totalTZS = (Number(selectedProduct.priceTZS || selectedProduct.price) || 0) * quantity;
 
     const saleRecord = {
       orderId,
-      customerName: customerName || 'Walk-in Customer',
-      phoneNumber: 'In-Shop Counter',
+      customerName: customerName || (channel === 'online' ? 'Online Customer' : 'Walk-in Customer'),
+      phoneNumber: channel === 'online' ? 'Online WhatsApp/Phone' : 'Shop Counter',
       country: 'Tanzania',
-      city: 'Local Store',
-      address: 'Shop Counter',
+      city: 'Local Area',
+      address: channel === 'online' ? 'Delivery via Courier' : 'Direct Pickup Counter',
       paymentMethod,
       items: [
         {
@@ -77,8 +78,8 @@ export const BmsPOS = () => {
       ],
       totalTZS,
       currency: 'TZS',
-      channel: 'pos',
-      status: 'Delivered',
+      channel: channel,
+      status: channel === 'online' ? 'Confirmed' : 'Delivered',
       recordedByStaffId: currentUser?.uid || 'staff',
       recordedByStaffName: userProfile?.name || currentUser?.email || 'Staff Worker',
       createdAt: new Date().toISOString()
@@ -197,16 +198,47 @@ export const BmsPOS = () => {
               </div>
             </div>
 
+            {/* Order Channel: Walk-in vs Online */}
+            <div>
+              <label className="block text-xs font-bold text-brand-charcoal mb-1">
+                Sales Channel *
+              </label>
+              <div className="grid grid-cols-2 gap-2">
+                <button
+                  type="button"
+                  onClick={() => setChannel('walk-in')}
+                  className={`py-2 px-3 rounded-xl text-xs font-bold border transition-colors ${
+                    channel === 'walk-in'
+                      ? 'bg-brand-forest text-white border-brand-forest shadow-sm'
+                      : 'bg-brand-surface/40 text-brand-charcoal border-brand-leaf/30 hover:bg-brand-surface'
+                  }`}
+                >
+                  Walk-in Customer
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setChannel('online')}
+                  className={`py-2 px-3 rounded-xl text-xs font-bold border transition-colors ${
+                    channel === 'online'
+                      ? 'bg-brand-forest text-white border-brand-forest shadow-sm'
+                      : 'bg-brand-surface/40 text-brand-charcoal border-brand-leaf/30 hover:bg-brand-surface'
+                  }`}
+                >
+                  Online Customer
+                </button>
+              </div>
+            </div>
+
             {/* Customer Name */}
             <div>
               <label className="block text-xs font-bold text-brand-charcoal mb-1">
-                {t('bms.pos.customerName')}
+                Customer Name (Optional)
               </label>
               <div className="relative">
                 <User className="w-4 h-4 absolute left-3 top-3 text-brand-muted" />
                 <input
                   type="text"
-                  placeholder="e.g. Walk-in Customer"
+                  placeholder="e.g. Amina Juma / Customer Name"
                   value={customerName}
                   onChange={(e) => setCustomerName(e.target.value)}
                   className="w-full pl-9 pr-3 py-2.5 rounded-xl border border-brand-leaf/30 text-xs text-brand-charcoal focus:ring-2 focus:ring-brand-forest focus:outline-none bg-brand-surface/40"

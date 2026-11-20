@@ -1,14 +1,63 @@
 import React, { useState, useEffect } from 'react';
-import { collection, onSnapshot, query, orderBy } from 'firebase/firestore';
+import { collection, onSnapshot } from 'firebase/firestore';
 import { db } from '../../firebase';
 import { useLanguage } from '../../context/LanguageContext';
 import { ProductCard } from './ProductCard';
 import { ProductDetailsModal } from './ProductDetailsModal';
-import { Leaf, PackageOpen, Sparkles, Filter } from 'lucide-react';
+import { Leaf } from 'lucide-react';
+
+// The 2 official core SLIMFAST products (25,000 TZS each) + Complete Combo (50,000 TZS)
+export const DEFAULT_SLIMFAST_PRODUCTS = [
+  {
+    id: "sf-slimming-tea",
+    name: "SLIMFAST Best Slimming Tea (Jar)",
+    category: "Slimming Tea",
+    priceTZS: 25000,
+    stock: 50,
+    lowStockThreshold: 10,
+    batchNumber: "SF-TEA-2025",
+    expiryDate: "FEB 2027",
+    netWeight: "150g Jar",
+    ingredients: "Moringa oleifera, Black Pepper, Great Basil, Garcinia Cambogia, Fennel",
+    directions: "1 teaspoon in boiling water, steep 4 minutes, 1 cup daily before bed.",
+    benefits: "Visceral belly fat burn, Digestive detox, Anti-bloating, Metabolism boost, Blood sugar support",
+    imageUrl: "https://images.unsplash.com/photo-1576092768241-dec231879fc3?auto=format&fit=crop&w=600&q=80"
+  },
+  {
+    id: "sf-bean-powder",
+    name: "SLIMFAST Bean Powder for Weight Loss (250g Pouch)",
+    category: "Bean Powder",
+    priceTZS: 25000,
+    stock: 50,
+    lowStockThreshold: 10,
+    batchNumber: "SF-BP-2025",
+    expiryDate: "FEB 2027",
+    netWeight: "250g Pouch",
+    ingredients: "Unroasted Arabica AAA Decaffeinated Beans, Green Tea Extracts, Dandelion Purifying Herbs",
+    directions: "1 coffee spoon in boiling water every morning before or during breakfast.",
+    benefits: "Appetite suppression, Thermogenesis, Cholesterol balance, Clean all-day vitality",
+    imageUrl: "https://images.unsplash.com/photo-1544787219-7f47ccb76574?auto=format&fit=crop&w=600&q=80"
+  },
+  {
+    id: "sf-full-combo",
+    name: "SLIMFAST Complete Duo Combo (Tea + Bean Powder)",
+    category: "Combo Treatment",
+    priceTZS: 50000,
+    stock: 40,
+    lowStockThreshold: 5,
+    batchNumber: "SF-COMBO-2025",
+    expiryDate: "FEB 2027",
+    netWeight: "Tea (150g) + Bean Powder (250g)",
+    ingredients: "Morning Arabica Bean Powder + Evening Moringa Slimming Tea synergistic treatment",
+    directions: "Morning: 1 spoon Bean Powder with breakfast. Evening: 1 cup Slimming Tea before sleep.",
+    benefits: "Full 24-hour fat burn, appetite control, total digestive cleansing & body detox",
+    imageUrl: "https://images.unsplash.com/photo-1540420773420-3366772f4999?auto=format&fit=crop&w=600&q=80"
+  }
+];
 
 export const ProductCatalog = () => {
   const { t } = useLanguage();
-  const [products, setProducts] = useState([]);
+  const [products, setProducts] = useState(DEFAULT_SLIMFAST_PRODUCTS);
   const [loading, setLoading] = useState(true);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [filterCategory, setFilterCategory] = useState('ALL');
@@ -22,20 +71,27 @@ export const ProductCatalog = () => {
     try {
       const q = collection(db, 'products');
       const unsubscribe = onSnapshot(q, (snapshot) => {
-        const items = [];
-        snapshot.forEach((doc) => {
-          items.push({ id: doc.id, ...doc.data() });
-        });
-        setProducts(items);
+        if (!snapshot.empty) {
+          const items = [];
+          snapshot.forEach((doc) => {
+            items.push({ id: doc.id, ...doc.data() });
+          });
+          setProducts(items);
+        } else {
+          // If Firestore collection has not been seeded yet, present the official default products
+          setProducts(DEFAULT_SLIMFAST_PRODUCTS);
+        }
         setLoading(false);
       }, (err) => {
         console.warn('Firestore products fetch notice:', err.message);
+        setProducts(DEFAULT_SLIMFAST_PRODUCTS);
         setLoading(false);
       });
 
       return () => unsubscribe();
     } catch (e) {
       console.error('Failed to listen to products:', e);
+      setProducts(DEFAULT_SLIMFAST_PRODUCTS);
       setLoading(false);
     }
   }, []);
@@ -66,8 +122,8 @@ export const ProductCatalog = () => {
           </p>
         </div>
 
-        {/* Categories Bar (Only if products exist) */}
-        {products.length > 0 && categories.length > 2 && (
+        {/* Categories Bar */}
+        {categories.length > 2 && (
           <div className="flex flex-wrap items-center justify-center gap-2 mb-10">
             {categories.map((cat) => (
               <button
@@ -86,53 +142,16 @@ export const ProductCatalog = () => {
           </div>
         )}
 
-        {/* Loading State */}
-        {loading ? (
-          <div className="flex flex-col items-center justify-center py-20 space-y-4">
-            <div className="w-12 h-12 border-4 border-brand-leaf/30 border-t-brand-forest rounded-full animate-spin" />
-            <p className="text-sm font-semibold text-brand-muted">{t('loading')}</p>
-          </div>
-        ) : products.length === 0 ? (
-          
-          /* Clean Empty State (Strictly compliant with No Demo Data Rule) */
-          <div className="max-w-xl mx-auto text-center py-16 px-6 bg-brand-surface/70 rounded-3xl border border-dashed border-brand-leaf/40 space-y-4 shadow-sm">
-            <div className="w-20 h-20 mx-auto rounded-2xl bg-white flex items-center justify-center text-brand-muted shadow-sm">
-              <PackageOpen className="w-10 h-10 text-brand-leaf" />
-            </div>
-            
-            <h3 className="text-2xl font-bold font-serif text-brand-forest">
-              {t('products.emptyTitle')}
-            </h3>
-
-            <p className="text-sm text-brand-charcoal/70 leading-relaxed max-w-md mx-auto">
-              {t('products.emptyDesc')}
-            </p>
-
-            <div className="pt-2">
-              <a
-                href="https://wa.me/255752613616?text=Hello%20SLIMFAST!%20I%20would%20like%20to%20inquire%20about%20product%20availability."
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center space-x-2 px-5 py-2.5 rounded-xl bg-brand-forest hover:bg-brand-leaf text-white font-bold text-xs shadow-sm transition-all"
-              >
-                <span>WhatsApp Customer Desk (+255 752 613 616)</span>
-              </a>
-            </div>
-          </div>
-
-        ) : (
-
-          /* Product Grid */
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 max-w-4xl mx-auto gap-8">
-            {filteredProducts.map((product) => (
-              <ProductCard
-                key={product.id}
-                product={product}
-                onViewDetails={(prod) => setSelectedProduct(prod)}
-              />
-            ))}
-          </div>
-        )}
+        {/* Product Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 max-w-6xl mx-auto gap-8">
+          {filteredProducts.map((product) => (
+            <ProductCard
+              key={product.id}
+              product={product}
+              onViewDetails={(prod) => setSelectedProduct(prod)}
+            />
+          ))}
+        </div>
 
       </div>
 
@@ -146,4 +165,3 @@ export const ProductCatalog = () => {
     </section>
   );
 };
-

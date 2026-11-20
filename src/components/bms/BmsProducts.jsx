@@ -32,10 +32,10 @@ export const OFFICIAL_SLIMFAST_CATALOG = [
   {
     name: "SLIMFAST Best Slimming Tea (Jar)",
     category: "Slimming Tea",
-    priceTZS: 45000,
+    priceTZS: 25000,
     stock: 50,
     lowStockThreshold: 10,
-    batchNumber: "SF-TEA-2024-01",
+    batchNumber: "SF-TEA-2025",
     expiryDate: "FEB 2027",
     netWeight: "150g Jar",
     ingredients: "Moringa oleifera, Black Pepper, Great Basil, Garcinia Cambogia, Fennel",
@@ -46,16 +46,30 @@ export const OFFICIAL_SLIMFAST_CATALOG = [
   {
     name: "SLIMFAST Bean Powder for Weight Loss (250g Pouch)",
     category: "Bean Powder",
-    priceTZS: 55000,
-    stock: 40,
-    lowStockThreshold: 8,
-    batchNumber: "SF-BP-2024-02",
+    priceTZS: 25000,
+    stock: 50,
+    lowStockThreshold: 10,
+    batchNumber: "SF-BP-2025",
     expiryDate: "FEB 2027",
     netWeight: "250g Pouch",
     ingredients: "Unroasted Arabica AAA Decaffeinated Beans, Green Tea Extracts, Dandelion Purifying Herbs",
     directions: "1 coffee spoon in boiling water every morning before or during breakfast.",
     benefits: "Natural appetite suppression, Accelerated thermogenesis, Cholesterol balance, Clean all-day vitality",
     imageUrl: "https://images.unsplash.com/photo-1544787219-7f47ccb76574?auto=format&fit=crop&w=600&q=80"
+  },
+  {
+    name: "SLIMFAST Complete Duo Combo (Tea + Bean Powder)",
+    category: "Combo Treatment",
+    priceTZS: 50000,
+    stock: 40,
+    lowStockThreshold: 5,
+    batchNumber: "SF-COMBO-2025",
+    expiryDate: "FEB 2027",
+    netWeight: "Tea (150g) + Bean Powder (250g)",
+    ingredients: "Morning Arabica Bean Powder + Evening Moringa Slimming Tea synergistic treatment",
+    directions: "Morning: 1 spoon Bean Powder with breakfast. Evening: 1 cup Slimming Tea before sleep.",
+    benefits: "Full 24-hour fat burn, appetite control, total digestive cleansing & body detox",
+    imageUrl: "https://images.unsplash.com/photo-1540420773420-3366772f4999?auto=format&fit=crop&w=600&q=80"
   }
 ];
 
