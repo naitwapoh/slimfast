@@ -110,10 +110,12 @@ export const ProductCatalog = () => {
 
             <div className="pt-2">
               <a
-                href="#portal"
-                className="inline-flex items-center space-x-2 text-xs font-bold text-brand-forest hover:text-brand-leaf underline underline-offset-4"
+                href="https://wa.me/255752613616?text=Hello%20SLIMFAST!%20I%20would%20like%20to%20inquire%20about%20product%20availability."
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center space-x-2 px-5 py-2.5 rounded-xl bg-brand-forest hover:bg-brand-leaf text-white font-bold text-xs shadow-sm transition-all"
               >
-                <span>{t('portalLink')}</span>
+                <span>WhatsApp Customer Desk (+255 752 613 616)</span>
               </a>
             </div>
           </div>

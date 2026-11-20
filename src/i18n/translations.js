@@ -67,9 +67,9 @@ export const translations = {
     // Products Section
     products: {
       title: "Our Organic Herbal Collection",
-      subtitle: "Pure, potent, and sustainably packaged. Real products loaded directly from our live Firestore inventory.",
-      emptyTitle: "No Products In Catalog",
-      emptyDesc: "No products have been added to the inventory yet. Business owners can add products via the BMS Portal.",
+      subtitle: "Pure, potent, and sustainably packaged organic herbal wellness solutions.",
+      emptyTitle: "Fresh Herbal Batches Preparing",
+      emptyDesc: "New organic herbal infusions are currently being freshly packaged. Contact our customer care on WhatsApp to reserve yours or inquire about availability.",
       quickAddSeed: "Initialize Official SLIMFAST Catalog (Owner Quick Setup)",
       inStock: "In Stock",
       outOfStock: "Sold Out",
@@ -399,9 +399,9 @@ export const translations = {
     // Products Section
     products: {
       title: "Mkusanyiko Wetu wa Bidhaa Asilia",
-      subtitle: "Safi, zenye nguvu, na zilizofungashwa kwa ubora wa hali ya juu. Zinasomwa moja kwa moja kutoka kwenye ghala la Firestore.",
-      emptyTitle: "Hakuna Bidhaa Kwenye Ghala",
-      emptyDesc: "Bado hakuna bidhaa zilizowekwa kwenye mfumo. Mmiliki wa biashara anaweza kuongeza bidhaa kupitia Mlango wa Usimamizi.",
+      subtitle: "Safi, zenye nguvu, na zilizofungashwa kwa ubora wa hali ya juu kwa ajili ya afya yako.",
+      emptyTitle: "Mzigo Mpya Unaandaliwa",
+      emptyDesc: "Mzigo mpya wa mimea asilia unafungashwa hivi punde. Wasiliana na huduma kwa wateja kupitia WhatsApp kuweka oda yako au kujua upatikanaji.",
       quickAddSeed: "Weka Bidhaa Rasmi za SLIMFAST (Mpangilio wa Haraka)",
       inStock: "Zipo Ghala",
       outOfStock: "Zimekwisha",
